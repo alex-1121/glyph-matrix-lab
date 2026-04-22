@@ -1,0 +1,29 @@
+# Built artifacts
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Build directories
+build/
+app/build/
+.gradle/
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+*.hprof
+captures/
+local.properties
+
+# Kotlin compilation caches
+**/.kotlin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NOTE: app/libs/*.aar is intentionally NOT ignored.
+# The GlyphMatrix SDK AAR has no Maven artifact and must be committed.
+/filter_logs.py
+/plans/

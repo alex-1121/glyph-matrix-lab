@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Matrix Lab</string>
+    <string name="toy_name_composite">Composite Glyph</string>
+    <string name="toy_summary_composite">Digital Clock, Equalizer, Call status indicator</string>
+</resources>
