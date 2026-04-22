@@ -20,7 +20,8 @@ class RepositoryCustomGlyphProvider(
         if (selection.mode != DisplayPriority.IDLE_ONLY) {
             return null
         }
-        val image = repository.getImage(selection.imageId) ?: return null
+        val imageId = selection.imageId ?: return null
+        val image = repository.getImage(imageId) ?: return null
         return GlyphImageSerializer.binaryToPixelGrid(image.pixels)
     }
 }

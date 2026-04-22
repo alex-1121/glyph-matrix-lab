@@ -213,6 +213,7 @@ class ImageEditorActivity : Activity() {
 
     private fun selectedToast(mode: DisplayPriority): Int {
         return when (mode) {
+            DisplayPriority.COMPOSITE -> R.string.toast_composite_selected
             DisplayPriority.IDLE_ONLY -> R.string.toast_idle_selected
             DisplayPriority.ALWAYS_ON -> R.string.toast_always_selected
         }

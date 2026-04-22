@@ -10,6 +10,7 @@ data class AodToySetupGuidance(
 object AodToySelectionAdvisor {
     fun expectedSource(mode: DisplayPriority): LiveGlyphSource {
         return when (mode) {
+            DisplayPriority.COMPOSITE -> LiveGlyphSource.COMPOSITE_TOY
             DisplayPriority.IDLE_ONLY -> LiveGlyphSource.COMPOSITE_TOY
             DisplayPriority.ALWAYS_ON -> LiveGlyphSource.STATIC_IMAGE_TOY
         }

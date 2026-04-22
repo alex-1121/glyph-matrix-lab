@@ -61,7 +61,8 @@ class StaticImageToyService : GlyphToyBase("StaticImageToy") {
             return
         }
 
-        val image = repository.getImage(selection.imageId)
+        val imageId = selection.imageId
+        val image = imageId?.let(repository::getImage)
         val grid = image?.pixels?.let(GlyphImageSerializer::binaryToPixelGrid)
         displayStaticFrame(sink, grid ?: PixelGrid())
     }

@@ -22,12 +22,14 @@ import com.sajenko.glyphtoys.models.DisplayPriority
 import com.sajenko.glyphtoys.repository.GlyphImageRepository
 import com.sajenko.glyphtoys.serialization.GlyphImageSerializer
 import com.sajenko.glyphtoys.toys.AodToySelectionAdvisor
+import com.sajenko.glyphtoys.toys.FrameBuilders
 import com.sajenko.glyphtoys.toys.LiveGlyphFrame
 import com.sajenko.glyphtoys.toys.LiveGlyphMode
 import com.sajenko.glyphtoys.toys.LiveGlyphPreview
 import com.sajenko.glyphtoys.toys.LiveGlyphSource
 import com.sajenko.glyphtoys.toys.PixelGrid
 import com.sajenko.glyphtoys.views.GlyphMatrixView
+import java.util.Calendar
 
 class MainActivity : Activity(), LiveGlyphPreview.Listener {
     private lateinit var repository: GlyphImageRepository
@@ -136,17 +138,32 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             return
         }
 
-        val image = selection?.let { repository.getImage(it.imageId) }
-        val grid = image?.pixels?.let(GlyphImageSerializer::binaryToPixelGrid)
-
         configuredMatrixView.maskedGrid = null
-        configuredMatrixView.pixelGrid = grid ?: PixelGrid()
         configuredMatrixView.interactiveMode = false
 
-        configuredLabel.text = if (selection != null && image != null) {
-            "${getString(R.string.configured_display_label)} ${image.name} - ${modeLabel(selection.mode)}"
-        } else {
-            "${getString(R.string.configured_display_label)} ${getString(R.string.no_selection)}"
+        when (selection?.mode) {
+            DisplayPriority.COMPOSITE -> {
+                configuredMatrixView.pixelGrid = currentClockGrid()
+                configuredLabel.text =
+                    "${getString(R.string.configured_display_label)} ${getString(R.string.configured_composite_clock)}"
+            }
+            DisplayPriority.IDLE_ONLY,
+            DisplayPriority.ALWAYS_ON -> {
+                val image = selection.imageId?.let(repository::getImage)
+                val grid = image?.pixels?.let(GlyphImageSerializer::binaryToPixelGrid)
+
+                configuredMatrixView.pixelGrid = grid ?: PixelGrid()
+                configuredLabel.text = if (image != null) {
+                    "${getString(R.string.configured_display_label)} ${image.name} - ${modeLabel(selection.mode)}"
+                } else {
+                    "${getString(R.string.configured_display_label)} ${getString(R.string.no_selection)}"
+                }
+            }
+            null -> {
+                configuredMatrixView.pixelGrid = PixelGrid()
+                configuredLabel.text =
+                    "${getString(R.string.configured_display_label)} ${getString(R.string.no_selection)}"
+            }
         }
         updateAodWarning(selection, null)
     }
@@ -249,6 +266,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
     private fun modeLabel(mode: DisplayPriority): String {
         return when (mode) {
+            DisplayPriority.COMPOSITE -> getString(R.string.priority_composite_clock)
             DisplayPriority.IDLE_ONLY -> getString(R.string.priority_idle_only)
             DisplayPriority.ALWAYS_ON -> getString(R.string.priority_always_on)
         }
@@ -269,6 +287,14 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             LiveGlyphSource.COMPOSITE_TOY -> getString(R.string.toy_name_composite)
             LiveGlyphSource.STATIC_IMAGE_TOY -> getString(R.string.toy_name_static)
         }
+    }
+
+    private fun currentClockGrid(): PixelGrid {
+        val calendar = Calendar.getInstance()
+        return FrameBuilders.buildClockGrid(
+            hour = calendar.get(Calendar.HOUR_OF_DAY),
+            minute = calendar.get(Calendar.MINUTE),
+        )
     }
 
     private companion object {

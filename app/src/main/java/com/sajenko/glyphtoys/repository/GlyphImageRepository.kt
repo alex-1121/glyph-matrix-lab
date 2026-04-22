@@ -87,26 +87,37 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
     }
 
     fun setActiveSelection(selection: ActiveGlyphSelection) {
-        if (getImage(selection.imageId) == null) {
+        if (selection.mode.requiresImage() && selection.imageId?.let(::getImage) == null) {
             clearActiveSelection()
             return
         }
 
-        prefs.edit()
-            .putString(KeyActiveSelectionId, selection.imageId)
+        val editor = prefs.edit()
             .putString(KeyActiveSelectionMode, selection.mode.name)
             .putLong(KeyActiveSelectionUpdated, selection.updatedAt)
-            .commit()
+
+        if (selection.imageId == null) {
+            editor.remove(KeyActiveSelectionId)
+        } else {
+            editor.putString(KeyActiveSelectionId, selection.imageId)
+        }
+
+        editor.commit()
     }
 
     fun getActiveSelection(): ActiveGlyphSelection? {
-        val imageId = prefs.getString(KeyActiveSelectionId, null) ?: return null
         val modeName = prefs.getString(KeyActiveSelectionMode, null) ?: return null
         val updatedAt = prefs.getLong(KeyActiveSelectionUpdated, MissingTimestamp)
         val mode = runCatching { DisplayPriority.valueOf(modeName) }.getOrNull() ?: return null
-        if (updatedAt == MissingTimestamp || getImage(imageId) == null) {
+        if (updatedAt == MissingTimestamp) {
             return null
         }
+
+        val imageId = prefs.getString(KeyActiveSelectionId, null)
+        if (mode.requiresImage() && (imageId == null || getImage(imageId) == null)) {
+            return null
+        }
+
         return ActiveGlyphSelection(
             imageId = imageId,
             mode = mode,
@@ -150,5 +161,13 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         fun imagePixelsKey(id: String): String = "image_${id}_pixels"
         fun imageCreatedKey(id: String): String = "image_${id}_created"
         fun imageUpdatedKey(id: String): String = "image_${id}_updated"
+    }
+}
+
+private fun DisplayPriority.requiresImage(): Boolean {
+    return when (this) {
+        DisplayPriority.COMPOSITE -> false
+        DisplayPriority.IDLE_ONLY,
+        DisplayPriority.ALWAYS_ON -> true
     }
 }

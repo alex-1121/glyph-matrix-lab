@@ -8,6 +8,14 @@ import org.junit.Test
 
 class AodToySelectionAdvisorTest {
     @Test
+    fun `composite expects composite toy source`() {
+        assertEquals(
+            LiveGlyphSource.COMPOSITE_TOY,
+            AodToySelectionAdvisor.expectedSource(DisplayPriority.COMPOSITE),
+        )
+    }
+
+    @Test
     fun `idle only expects composite toy source`() {
         assertEquals(
             LiveGlyphSource.COMPOSITE_TOY,
