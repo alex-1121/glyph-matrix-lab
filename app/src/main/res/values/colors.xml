@@ -16,4 +16,7 @@
     <color name="mode_always_text">#90CAF9</color>
     <color name="active_badge">#4CAF50</color>
     <color name="text_secondary">#B0B0B0</color>
+    <color name="warning_background">#211C12</color>
+    <color name="warning_stroke">#8A6A22</color>
+    <color name="warning_text">#FFD166</color>
 </resources>

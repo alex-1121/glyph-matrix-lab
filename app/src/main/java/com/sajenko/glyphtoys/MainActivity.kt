@@ -2,6 +2,8 @@ package com.sajenko.glyphtoys
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,9 +21,11 @@ import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
 import com.sajenko.glyphtoys.repository.GlyphImageRepository
 import com.sajenko.glyphtoys.serialization.GlyphImageSerializer
+import com.sajenko.glyphtoys.toys.AodToySelectionAdvisor
 import com.sajenko.glyphtoys.toys.LiveGlyphFrame
 import com.sajenko.glyphtoys.toys.LiveGlyphMode
 import com.sajenko.glyphtoys.toys.LiveGlyphPreview
+import com.sajenko.glyphtoys.toys.LiveGlyphSource
 import com.sajenko.glyphtoys.toys.PixelGrid
 import com.sajenko.glyphtoys.views.GlyphMatrixView
 
@@ -31,6 +35,9 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
     private lateinit var permissionSettingsButton: Button
     private lateinit var configuredLabel: TextView
     private lateinit var configuredMatrixView: GlyphMatrixView
+    private lateinit var aodWarningContainer: LinearLayout
+    private lateinit var aodWarningMessage: TextView
+    private lateinit var aodWarningButton: Button
     private lateinit var glyphListContainer: LinearLayout
     private var liveFrame: LiveGlyphFrame? = null
 
@@ -43,6 +50,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         ShowcaseGlyphImages.seedIfNeeded(this, repository)
         bindViews()
         permissionSettingsButton.setOnClickListener { openAppSettings() }
+        aodWarningButton.setOnClickListener { openAodToyPicker() }
         ensureAudioPermission()
     }
 
@@ -72,6 +80,9 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         permissionSettingsButton = findViewById(R.id.permissionSettingsButton)
         configuredLabel = findViewById(R.id.configuredLabel)
         configuredMatrixView = findViewById(R.id.configuredMatrixView)
+        aodWarningContainer = findViewById(R.id.aodWarningContainer)
+        aodWarningMessage = findViewById(R.id.aodWarningMessage)
+        aodWarningButton = findViewById(R.id.aodWarningButton)
         glyphListContainer = findViewById(R.id.glyphListContainer)
     }
 
@@ -115,15 +126,16 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
     private fun updateConfiguredPreview() {
         val frame = liveFrame ?: LiveGlyphPreview.latestFrame()
+        val selection = repository.getActiveSelection()
         if (frame != null) {
             configuredMatrixView.maskedGrid = null
             configuredMatrixView.pixelGrid = frame.grid
             configuredMatrixView.interactiveMode = false
             configuredLabel.text = "${getString(R.string.live_display_label)} ${liveModeLabel(frame.mode)}"
+            updateAodWarning(selection, frame)
             return
         }
 
-        val selection = repository.getActiveSelection()
         val image = selection?.let { repository.getImage(it.imageId) }
         val grid = image?.pixels?.let(GlyphImageSerializer::binaryToPixelGrid)
 
@@ -136,6 +148,24 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         } else {
             "${getString(R.string.configured_display_label)} ${getString(R.string.no_selection)}"
         }
+        updateAodWarning(selection, null)
+    }
+
+    private fun updateAodWarning(selection: ActiveGlyphSelection?, frame: LiveGlyphFrame?) {
+        val guidance = selection?.let {
+            AodToySelectionAdvisor.guidanceFor(it.mode, frame?.source)
+        }
+
+        if (selection == null || guidance == null) {
+            aodWarningContainer.visibility = View.GONE
+            return
+        }
+
+        aodWarningMessage.text = getString(
+            R.string.aod_warning_message,
+            toySourceLabel(guidance.expectedSource),
+        )
+        aodWarningContainer.visibility = View.VISIBLE
     }
 
     private fun rebuildGlyphList() {
@@ -203,6 +233,20 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         startActivity(intent)
     }
 
+    private fun openAodToyPicker() {
+        val intent = Intent().setComponent(
+            ComponentName(
+                "com.nothing.thirdparty",
+                "com.nothing.thirdparty.matrix.toys.manager.AodToySelectActivity",
+            ),
+        )
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            // The AOD toy picker is only available on supported Nothing devices.
+        }
+    }
+
     private fun modeLabel(mode: DisplayPriority): String {
         return when (mode) {
             DisplayPriority.IDLE_ONLY -> getString(R.string.priority_idle_only)
@@ -217,6 +261,13 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             LiveGlyphMode.CUSTOM_IDLE -> getString(R.string.live_mode_custom_idle)
             LiveGlyphMode.EQUALIZER -> getString(R.string.live_mode_equalizer)
             LiveGlyphMode.STATIC_IMAGE -> getString(R.string.live_mode_static_image)
+        }
+    }
+
+    private fun toySourceLabel(source: LiveGlyphSource): String {
+        return when (source) {
+            LiveGlyphSource.COMPOSITE_TOY -> getString(R.string.toy_name_composite)
+            LiveGlyphSource.STATIC_IMAGE_TOY -> getString(R.string.toy_name_static)
         }
     }
 

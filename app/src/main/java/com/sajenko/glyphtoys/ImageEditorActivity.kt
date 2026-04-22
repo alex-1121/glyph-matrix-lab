@@ -2,8 +2,6 @@ package com.sajenko.glyphtoys
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
 import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
@@ -208,7 +207,15 @@ class ImageEditorActivity : Activity() {
                 updatedAt = System.currentTimeMillis(),
             ),
         )
-        openAodToyPicker()
+        Toast.makeText(this, selectedToast(priority), Toast.LENGTH_SHORT).show()
+        returnToMainActivity()
+    }
+
+    private fun selectedToast(mode: DisplayPriority): Int {
+        return when (mode) {
+            DisplayPriority.IDLE_ONLY -> R.string.toast_idle_selected
+            DisplayPriority.ALWAYS_ON -> R.string.toast_always_selected
+        }
     }
 
     private fun confirmDelete() {
@@ -224,18 +231,11 @@ class ImageEditorActivity : Activity() {
             .show()
     }
 
-    private fun openAodToyPicker() {
-        val intent = Intent().setComponent(
-            ComponentName(
-                "com.nothing.thirdparty",
-                "com.nothing.thirdparty.matrix.toys.manager.AodToySelectActivity",
-            ),
-        )
-        try {
-            startActivity(intent)
-        } catch (_: ActivityNotFoundException) {
-            // The AOD toy picker is only available on supported Nothing devices.
-        }
+    private fun returnToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+        finish()
     }
 
     private enum class EditorMode {

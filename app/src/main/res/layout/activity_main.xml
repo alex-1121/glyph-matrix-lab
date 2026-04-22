@@ -42,6 +42,43 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp" />
 
+        <LinearLayout
+            android:id="@+id/aodWarningContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_aod_warning"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/aodWarningTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/aod_warning_title"
+                android:textColor="@color/warning_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/aodWarningMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="2dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/aodWarningButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/aod_warning_open_settings"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/glyphListTitle"
             android:layout_width="match_parent"

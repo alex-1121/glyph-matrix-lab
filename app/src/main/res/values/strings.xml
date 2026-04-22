@@ -18,6 +18,9 @@
     <string name="live_mode_static_image">Static Image</string>
     <string name="no_selection">Not selected</string>
     <string name="glyph_composite_name">Composite Glyph</string>
+    <string name="aod_warning_title">AOD setup needed</string>
+    <string name="aod_warning_message">Select %1$s in AOD settings. If this warning persists, turn Glyph Interface on and off.</string>
+    <string name="aod_warning_open_settings">Open AOD settings</string>
     <string name="glyph_composite_desc">Digital Clock, Equalizer, Call status indicator</string>
     <string name="create_new_image">+ Create New Image</string>
     <string name="available_glyphs">Available Glyphs</string>
@@ -40,11 +43,13 @@
     <string name="editor_title_edit">Edit Image</string>
 
     <string name="priority_dialog_title">Select Display Mode</string>
-    <string name="priority_dialog_notice">Choose whether you want your image displayed always, or only when the phone is idle. You need to update Always-on Glyph Toy setting manually depending on your choice.</string>
-    <string name="priority_always_on">Always On</string>
-    <string name="priority_always_desc">Choose <b>Matrix Lab: Multi function</b> on the next screen. Keeps this image on the Glyph Matrix.</string>
+    <string name="priority_dialog_notice">Choose when this image should appear on your Glyph Matrix. You may need to select the correct Glyph Toy in AOD settings.</string>
     <string name="priority_idle_only">Idle Only</string>
-    <string name="priority_idle_desc">Choose <b>Matrix Lab: Static image</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
+    <string name="priority_idle_desc">Your image is displayed when the phone is idle. Equalizer and call status appear depending on phone state (media playing, active call).</string>
+    <string name="priority_always_on">Always On</string>
+    <string name="priority_always_desc">Your image is shown at all times. Standard Glyph Matrix features (notifications, volume indicator, etc.) still override it.</string>
+    <string name="toast_idle_selected">Image selected for Idle Only mode</string>
+    <string name="toast_always_selected">Image selected for Always On mode</string>
 
     <string name="delete_dialog_title">Delete Image?</string>
     <string name="delete_dialog_message">This action cannot be undone.</string>
