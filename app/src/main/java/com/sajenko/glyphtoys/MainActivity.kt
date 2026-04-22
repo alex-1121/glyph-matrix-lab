@@ -15,6 +15,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.sajenko.glyphtoys.models.ActiveGlyphSelection
+import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
 import com.sajenko.glyphtoys.repository.GlyphImageRepository
 import com.sajenko.glyphtoys.serialization.GlyphImageSerializer
@@ -139,32 +141,39 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
     private fun rebuildGlyphList() {
         glyphListContainer.removeAllViews()
+        val selection = repository.getActiveSelection()
+        val (showcaseImages, userImages) = repository.getAllImages()
+            .partition(ShowcaseGlyphImages::isShowcaseImage)
+
         addCompositeItem()
         addCreateNewItem()
-        val activeId = repository.getActiveSelection()?.imageId
-        repository.getAllImages().forEach { image ->
-            val item = layoutInflater.inflate(R.layout.item_glyph_image, glyphListContainer, false)
-            val thumbnail = item.findViewById<GlyphMatrixView>(R.id.imageThumbnail)
-            val name = item.findViewById<TextView>(R.id.imageName)
-            val mode = item.findViewById<TextView>(R.id.imageMode)
-            val badge = item.findViewById<TextView>(R.id.activeBadge)
+        userImages
+            .sortedByDescending { image -> image.createdAt }
+            .forEach { image -> addGlyphImageItem(image, selection) }
+        showcaseImages.forEach { image -> addGlyphImageItem(image, selection) }
+    }
 
-            thumbnail.pixelGrid = GlyphImageSerializer.binaryToPixelGrid(image.pixels) ?: PixelGrid()
-            thumbnail.maskedGrid = null
-            thumbnail.interactiveMode = false
-            name.text = image.name
-            val selection = repository.getActiveSelection()
-            mode.text = if (selection?.imageId == image.id) {
-                modeLabel(selection.mode)
-            } else {
-                getString(R.string.no_selection)
-            }
-            badge.visibility = if (activeId == image.id) View.VISIBLE else View.GONE
-            item.setOnClickListener {
-                startActivity(ImageEditorActivity.viewIntent(this, image.id))
-            }
-            glyphListContainer.addView(item)
+    private fun addGlyphImageItem(image: CustomGlyphImage, selection: ActiveGlyphSelection?) {
+        val item = layoutInflater.inflate(R.layout.item_glyph_image, glyphListContainer, false)
+        val thumbnail = item.findViewById<GlyphMatrixView>(R.id.imageThumbnail)
+        val name = item.findViewById<TextView>(R.id.imageName)
+        val mode = item.findViewById<TextView>(R.id.imageMode)
+        val badge = item.findViewById<TextView>(R.id.activeBadge)
+
+        thumbnail.pixelGrid = GlyphImageSerializer.binaryToPixelGrid(image.pixels) ?: PixelGrid()
+        thumbnail.maskedGrid = null
+        thumbnail.interactiveMode = false
+        name.text = image.name
+        mode.text = if (selection?.imageId == image.id) {
+            modeLabel(selection.mode)
+        } else {
+            getString(R.string.no_selection)
         }
+        badge.visibility = if (selection?.imageId == image.id) View.VISIBLE else View.GONE
+        item.setOnClickListener {
+            startActivity(ImageEditorActivity.viewIntent(this, image.id))
+        }
+        glyphListContainer.addView(item)
     }
 
     private fun addCompositeItem() {

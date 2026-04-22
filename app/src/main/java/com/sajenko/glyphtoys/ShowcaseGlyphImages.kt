@@ -10,7 +10,12 @@ import com.sajenko.glyphtoys.toys.PixelGrid
 object ShowcaseGlyphImages {
     private const val SeedVersion = 1
     private const val SeedVersionKey = "showcase_images_seed_version"
+    private const val ShowcaseImageIdPrefix = "showcase_"
     private const val StableTimestamp = 0L
+
+    fun isShowcaseImage(image: CustomGlyphImage): Boolean {
+        return image.id.startsWith(ShowcaseImageIdPrefix)
+    }
 
     fun seedIfNeeded(context: Context, repository: GlyphImageRepository) {
         repository.seedImagesOnce(
@@ -23,17 +28,17 @@ object ShowcaseGlyphImages {
     private fun buildImages(context: Context): List<CustomGlyphImage> {
         return listOf(
             image(
-                id = "showcase_app_logo",
+                id = "${ShowcaseImageIdPrefix}app_logo",
                 name = context.getString(R.string.showcase_matrix_lab_logo_name),
                 grid = FrameBuilders.buildLabIconGrid(),
             ),
             image(
-                id = "showcase_cross_example",
+                id = "${ShowcaseImageIdPrefix}cross_example",
                 name = context.getString(R.string.showcase_cross_example_name),
                 grid = FrameBuilders.buildAppLogoGrid(),
             ),
             image(
-                id = "showcase_dollar_example",
+                id = "${ShowcaseImageIdPrefix}dollar_example",
                 name = context.getString(R.string.showcase_dollar_icon_name),
                 grid = FrameBuilders.buildDollarIconGrid(),
             ),
