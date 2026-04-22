@@ -40,11 +40,11 @@
     <string name="editor_title_edit">Edit Image</string>
 
     <string name="priority_dialog_title">Select Display Mode</string>
-    <string name="priority_dialog_notice">Choose whether you want your image displayed always, or only when the phone is idle. Standard Glyph Features will still override the image (Volume indicator, Glyph Timer, etc). You need to update Always-on Glyph Toy setting manually depending on your choice.</string>
+    <string name="priority_dialog_notice">Choose whether you want your image displayed always, or only when the phone is idle. You need to update Always-on Glyph Toy setting manually depending on your choice.</string>
     <string name="priority_always_on">Always On</string>
-    <string name="priority_always_desc">Choose <b>Static Image</b> on the next screen. Keeps this image on the Glyph Matrix.</string>
+    <string name="priority_always_desc">Choose <b>Matrix Lab: Multi function</b> on the next screen. Keeps this image on the Glyph Matrix.</string>
     <string name="priority_idle_only">Idle Only</string>
-    <string name="priority_idle_desc">Choose <b>Composite Glyph (Idle Only)</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
+    <string name="priority_idle_desc">Choose <b>Matrix Lab: Static image</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
 
     <string name="delete_dialog_title">Delete Image?</string>
     <string name="delete_dialog_message">This action cannot be undone.</string>
@@ -54,4 +54,14 @@
     <string name="name_image_hint">Enter image name</string>
     <string name="composite_dialog_title">Composite Glyph</string>
     <string name="composite_dialog_message">The Composite Glyph Toy automatically shows call status first, then the music equalizer, then a selected idle image, then the clock. Select it in the Nothing AOD toy picker to use idle images.</string>
+    <string name="composite_info_intro">The Composite Glyph Toy switches between different display modes automatically based on your phone\'s state.</string>
+    <string name="composite_feature_clock_title">Digital Clock</string>
+    <string name="composite_feature_clock_desc">Displays the current time on the Glyph Matrix. This is the default mode when the phone is idle. Can be replaced with a custom image you create.</string>
+    <string name="composite_feature_clock_preview">Clock preview on Glyph Matrix</string>
+    <string name="composite_feature_equalizer_title">Equalizer</string>
+    <string name="composite_feature_equalizer_desc">Visualizes currently playing audio with animated bars. Activates automatically when media is playing. Requires microphone permission.</string>
+    <string name="composite_feature_equalizer_preview">Equalizer preview on Glyph Matrix</string>
+    <string name="composite_feature_call_title">Call Indicator</string>
+    <string name="composite_feature_call_desc">Shows a phone icon on the matrix during active calls. This has the highest priority and overrides all other modes.</string>
+    <string name="composite_feature_call_preview">Call indicator preview on Glyph Matrix</string>
 </resources>

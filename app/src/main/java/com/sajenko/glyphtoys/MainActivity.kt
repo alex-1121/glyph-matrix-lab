@@ -2,7 +2,6 @@ package com.sajenko.glyphtoys
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -179,11 +178,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
     private fun addCompositeItem() {
         val item = layoutInflater.inflate(R.layout.item_glyph_composite, glyphListContainer, false)
         item.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.composite_dialog_title)
-                .setMessage(R.string.composite_dialog_message)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            startActivity(CompositeInfoActivity.intent(this))
         }
         glyphListContainer.addView(item)
     }

@@ -36,6 +36,10 @@
             android:name=".ImageEditorActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".CompositeInfoActivity"
+            android:exported="false" />
+
         <!-- Clock & Music toy -->
         <service
             android:name=".toys.CompositeToyService"
