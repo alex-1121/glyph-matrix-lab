@@ -32,6 +32,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ImageEditorActivity"
+            android:exported="false" />
+
         <!-- Clock & Music toy -->
         <service
             android:name=".toys.CompositeToyService"
@@ -50,6 +54,29 @@
             <meta-data
                 android:name="com.nothing.glyph.toy.summary"
                 android:resource="@string/toy_summary_composite" />
+            <meta-data
+                android:name="com.nothing.glyph.toy.aod_support"
+                android:value="1" />
+        </service>
+
+        <!-- Static custom image toy -->
+        <service
+            android:name=".toys.StaticImageToyService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.nothing.glyph.TOY" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.nothing.glyph.toy.name"
+                android:resource="@string/toy_name_static" />
+            <meta-data
+                android:name="com.nothing.glyph.toy.image"
+                android:resource="@drawable/toy_preview_static" />
+            <meta-data
+                android:name="com.nothing.glyph.toy.summary"
+                android:resource="@string/toy_summary_static" />
             <meta-data
                 android:name="com.nothing.glyph.toy.aod_support"
                 android:value="1" />

@@ -2,6 +2,7 @@ package com.sajenko.glyphtoys.toys
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.AudioPlaybackConfiguration
@@ -12,6 +13,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.nothing.ketchum.GlyphMatrixManager
+import com.sajenko.glyphtoys.repository.GlyphImageRepository
 
 open class CompositeToyService : GlyphToyBase("CompositeToy") {
 
@@ -26,6 +28,8 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
     private var equalizerRetryScheduled = false
     private var equalizerRetryLimitLogged = false
     private var controller: CompositeToyController? = null
+    private lateinit var repository: GlyphImageRepository
+    private var customGlyphProvider: RepositoryCustomGlyphProvider? = null
     private var callAnimationStep = 0
 
     @Volatile
@@ -67,6 +71,15 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             "Retrying equalizer startup ($equalizerRetryAttempts/$MAX_EQUALIZER_RETRIES) while playback remains active",
         )
         startEqualizer()
+    }
+
+    private val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (shouldRefreshCustomGlyphForKey(key)) {
+            handler.post {
+                customGlyphProvider?.refresh()
+                renderCurrentState(force = true)
+            }
+        }
     }
 
     private val renderTickRunnable = object : Runnable {
@@ -129,6 +142,13 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
     }
 
     override fun onServiceConnected(context: Context, gmm: GlyphMatrixManager) {
+        repository = GlyphImageRepository(
+            context.getSharedPreferences(GlyphImageRepository.PreferencesName, Context.MODE_PRIVATE),
+        )
+        val nextCustomGlyphProvider = RepositoryCustomGlyphProvider(repository)
+        nextCustomGlyphProvider.refresh()
+        customGlyphProvider = nextCustomGlyphProvider
+
         val stateProvider = object : SystemStateProvider {
             override val isCallActive: Boolean
                 get() = this@CompositeToyService.isCallActive
@@ -139,7 +159,16 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         controller = CompositeToyController(
             frameSink = GlyphDisplayAdapter(context, gmm),
             stateProvider = stateProvider,
+            customGlyphProvider = nextCustomGlyphProvider,
+            liveFrameReporter = { grid, mode ->
+                LiveGlyphPreview.publish(
+                    grid = grid,
+                    source = LiveGlyphSource.COMPOSITE_TOY,
+                    mode = mode.toLiveGlyphMode(),
+                )
+            },
         )
+        repository.registerChangeListener(prefListener)
         val nextAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager = nextAudioManager
         isCallActive = nextAudioManager.isCallLikeMode()
@@ -185,6 +214,9 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
 
     override fun onServiceDisconnected(context: Context) {
         handler.removeCallbacks(minuteTickRunnable)
+        if (::repository.isInitialized) {
+            repository.unregisterChangeListener(prefListener)
+        }
         cancelRenderTick()
         stopCallAnimation()
         modeChangedListener?.let { audioManager?.removeOnModeChangedListener(it) }
@@ -195,6 +227,8 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         isPlaybackActive = false
         isCallActive = false
         controller = null
+        customGlyphProvider = null
+        LiveGlyphPreview.clear(LiveGlyphSource.COMPOSITE_TOY)
     }
 
     override fun onAod() {
@@ -259,6 +293,20 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         isCallActive -> DisplayMode.CALL
         isPlaybackActive -> DisplayMode.EQUALIZER
         else -> DisplayMode.CLOCK
+    }
+
+    private fun shouldRefreshCustomGlyphForKey(key: String?): Boolean {
+        if (!::repository.isInitialized) {
+            return false
+        }
+        if (key == GlyphImageRepository.KeyActiveSelectionId ||
+            key == GlyphImageRepository.KeyActiveSelectionMode ||
+            key == GlyphImageRepository.KeyImageList
+        ) {
+            return true
+        }
+        val activeId = repository.getActiveSelection()?.imageId
+        return activeId != null && key?.startsWith("image_${activeId}_") == true
     }
 
     private fun startEqualizer() {

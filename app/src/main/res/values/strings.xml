@@ -3,4 +3,55 @@
     <string name="app_name">Matrix Lab</string>
     <string name="toy_name_composite">Composite Glyph</string>
     <string name="toy_summary_composite">Digital Clock, Equalizer, Call status indicator</string>
+    <string name="toy_name_static">Matrix Lab: Multi-feature</string>
+    <string name="toy_summary_static">Matrix Lab: Image</string>
+
+    <string name="permission_status_granted">Audio permission granted</string>
+    <string name="permission_status_denied">Audio permission required for the equalizer.</string>
+    <string name="permission_open_settings">Open Settings</string>
+    <string name="configured_display_label">Configured Image:</string>
+    <string name="live_display_label">Live Preview:</string>
+    <string name="live_mode_call">Call</string>
+    <string name="live_mode_clock">Clock</string>
+    <string name="live_mode_custom_idle">Custom Idle</string>
+    <string name="live_mode_equalizer">Equalizer</string>
+    <string name="live_mode_static_image">Static Image</string>
+    <string name="no_selection">Not selected</string>
+    <string name="glyph_composite_name">Composite Glyph</string>
+    <string name="glyph_composite_desc">Clock, Equalizer, Call indicator</string>
+    <string name="create_new_image">+ Create New Image</string>
+    <string name="available_glyphs">Available Glyphs</string>
+    <string name="selected_badge">Selected</string>
+    <string name="untitled_image">Untitled Image</string>
+
+    <string name="btn_save">Save</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_select_for_display">Select for Display</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_clear">Clear</string>
+    <string name="editor_instructions_interactive">Tap pixels to toggle. Grey X marks are not editable.</string>
+    <string name="editor_instructions_view">Viewing image</string>
+    <string name="editor_title_create">Create Image</string>
+    <string name="editor_title_view">View Image</string>
+    <string name="editor_title_edit">Edit Image</string>
+
+    <string name="priority_dialog_title">Select Display Mode</string>
+    <string name="priority_dialog_notice">Choose whether you want your image displayed always, or only when the phone is idle. Standard Glyph Features will still override the image (Volume indicator, Glyph Timer, etc). You need to update Always-on Glyph Toy setting manually depending on your choice.</string>
+    <string name="priority_always_on">Always On</string>
+    <string name="priority_always_desc">Choose <b>Static Image</b> on the next screen. Keeps this image on the Glyph Matrix.</string>
+    <string name="priority_idle_only">Idle Only</string>
+    <string name="priority_idle_desc">Choose <b>Composite Glyph</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
+
+    <string name="toast_idle_configured">Image configured. Select Composite Glyph Toy in Settings - Glyph - AOD Toy.</string>
+    <string name="toast_static_configured">Image configured. Select Static Image Toy in Settings - Glyph - AOD Toy.</string>
+
+    <string name="delete_dialog_title">Delete Image?</string>
+    <string name="delete_dialog_message">This action cannot be undone.</string>
+    <string name="delete_confirm">Delete</string>
+
+    <string name="name_image_dialog_title">Name Your Image</string>
+    <string name="name_image_hint">Enter image name</string>
+    <string name="composite_dialog_title">Composite Glyph</string>
+    <string name="composite_dialog_message">The Composite Glyph Toy automatically shows call status first, then the music equalizer, then a selected idle image, then the clock. Select it in the Nothing AOD toy picker to use idle images.</string>
 </resources>

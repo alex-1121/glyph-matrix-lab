@@ -5,6 +5,7 @@ import kotlin.math.roundToInt
 enum class DisplayMode {
     CALL,
     CLOCK,
+    CUSTOM_IDLE,
     EQUALIZER,
 }
 
@@ -18,6 +19,8 @@ class CompositeToyController(
     private val frameSink: FrameSink,
     private val stateProvider: SystemStateProvider,
     private val timeProvider: TimeProvider = SystemTimeProvider,
+    private val customGlyphProvider: CustomGlyphProvider = EmptyCustomGlyphProvider,
+    private val liveFrameReporter: (PixelGrid, DisplayMode) -> Unit = { _, _ -> },
 ) {
     private var lastRenderedMode: DisplayMode? = null
     private var lastRenderedMinute = -1
@@ -30,6 +33,7 @@ class CompositeToyController(
         return when {
             stateProvider.isCallActive -> DisplayMode.CALL
             stateProvider.isMediaPlaying -> DisplayMode.EQUALIZER
+            customGlyphProvider.idleImageGrid() != null -> DisplayMode.CUSTOM_IDLE
             else -> DisplayMode.CLOCK
         }
     }
@@ -47,15 +51,24 @@ class CompositeToyController(
         }
 
         when (mode) {
-            DisplayMode.CALL -> frameSink.display(FrameBuilders.buildCallGrid(callFrameIndex))
-            DisplayMode.CLOCK -> frameSink.display(
+            DisplayMode.CALL -> display(mode, FrameBuilders.buildCallGrid(callFrameIndex))
+            DisplayMode.CLOCK -> display(
+                mode,
                 FrameBuilders.buildClockGrid(timeProvider.hour(), minute),
             )
+            DisplayMode.CUSTOM_IDLE -> {
+                val grid = customGlyphProvider.idleImageGrid()
+                if (grid != null) {
+                    display(mode, grid)
+                } else {
+                    display(DisplayMode.CLOCK, FrameBuilders.buildClockGrid(timeProvider.hour(), minute))
+                }
+            }
             DisplayMode.EQUALIZER -> {
                 if (equalizerAvailable) {
                     return RenderResult.NeedsEqualizerRender
                 }
-                frameSink.display(FrameBuilders.buildEqualizerGrid(EqualizerProcessor.buildFallbackHeights()))
+                display(mode, FrameBuilders.buildEqualizerGrid(EqualizerProcessor.buildFallbackHeights()))
             }
         }
 
@@ -80,7 +93,7 @@ class CompositeToyController(
             }
         }
 
-        frameSink.display(FrameBuilders.buildEqualizerGrid(displayHeights))
+        display(DisplayMode.EQUALIZER, FrameBuilders.buildEqualizerGrid(displayHeights))
         lastRenderedMode = DisplayMode.EQUALIZER
         lastRenderedMinute = timeProvider.minute()
         lastRenderedCallFrameIndex = -1
@@ -88,7 +101,7 @@ class CompositeToyController(
     }
 
     fun renderFallbackEqualizer() {
-        frameSink.display(FrameBuilders.buildEqualizerGrid(EqualizerProcessor.buildFallbackHeights()))
+        display(DisplayMode.EQUALIZER, FrameBuilders.buildEqualizerGrid(EqualizerProcessor.buildFallbackHeights()))
         lastRenderedMode = DisplayMode.EQUALIZER
         lastRenderedMinute = timeProvider.minute()
         lastRenderedCallFrameIndex = -1
@@ -108,5 +121,10 @@ class CompositeToyController(
         return smoothedHeights.joinToString(prefix = "[", postfix = "]") { value ->
             value.roundToInt().toString()
         }
+    }
+
+    private fun display(mode: DisplayMode, grid: PixelGrid) {
+        frameSink.display(grid)
+        liveFrameReporter(grid, mode)
     }
 }

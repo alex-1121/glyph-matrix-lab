@@ -10,11 +10,21 @@ class CompositeToyControllerTest {
     private val fakeSink = FakeFrameSink()
     private val fakeState = FakeSystemStateProvider()
     private val fakeTime = FakeTimeProvider(currentHour = 12, currentMinute = 30)
+    private val fakeCustomGlyphProvider = FakeCustomGlyphProvider()
+    private val reportedFrames = mutableListOf<Pair<DisplayMode, PixelGrid>>()
     private lateinit var controller: CompositeToyController
 
     @Before
     fun setup() {
-        controller = CompositeToyController(fakeSink, fakeState, fakeTime)
+        fakeCustomGlyphProvider.grid = null
+        reportedFrames.clear()
+        controller = CompositeToyController(
+            frameSink = fakeSink,
+            stateProvider = fakeState,
+            timeProvider = fakeTime,
+            customGlyphProvider = fakeCustomGlyphProvider,
+            liveFrameReporter = { grid, mode -> reportedFrames.add(mode to grid.copy()) },
+        )
     }
 
     @Test
@@ -39,6 +49,31 @@ class CompositeToyControllerTest {
         fakeState.isMediaPlaying = false
 
         assertEquals(DisplayMode.CLOCK, controller.currentMode())
+    }
+
+    @Test
+    fun `idle with custom image shows CUSTOM_IDLE`() {
+        fakeCustomGlyphProvider.grid = PixelGrid().apply { set(6, 6) }
+
+        assertEquals(DisplayMode.CUSTOM_IDLE, controller.currentMode())
+
+        val result = controller.render(force = true)
+
+        assertEquals(RenderResult.Rendered, result)
+        assertTrue(fakeSink.lastFrame()!!.get(6, 6))
+        assertEquals(DisplayMode.CUSTOM_IDLE, reportedFrames.single().first)
+    }
+
+    @Test
+    fun `call and media take precedence over custom idle image`() {
+        fakeCustomGlyphProvider.grid = PixelGrid().apply { set(6, 6) }
+        fakeState.isMediaPlaying = true
+
+        assertEquals(DisplayMode.EQUALIZER, controller.currentMode())
+
+        fakeState.isCallActive = true
+
+        assertEquals(DisplayMode.CALL, controller.currentMode())
     }
 
     @Test
@@ -189,5 +224,11 @@ class CompositeToyControllerTest {
                 assertFalse("Col $col row $row should be off", grid.get(col, row))
             }
         }
+    }
+
+    private class FakeCustomGlyphProvider : CustomGlyphProvider {
+        var grid: PixelGrid? = null
+
+        override fun idleImageGrid(): PixelGrid? = grid
     }
 }

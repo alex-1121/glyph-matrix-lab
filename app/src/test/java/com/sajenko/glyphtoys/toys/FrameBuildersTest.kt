@@ -9,7 +9,7 @@ class FrameBuildersTest {
     fun `buildCallGrid frame 0 lights handset pixels only`() {
         val grid = FrameBuilders.buildCallGrid(frameIndex = 0)
 
-        assertTrue("Handset top should be lit", grid.get(3, 2))
+        assertTrue("Handset top should be lit", grid.get(6, 0))
         assertTrue("Handset body should be lit", grid.get(2, 2))
         assertTrue("Handset bottom should be lit", grid.get(6, 10))
         assertFalse("Inner wave should be off in frame 0", grid.get(6, 2))
@@ -91,5 +91,21 @@ class FrameBuildersTest {
         for (y in 0 until 13) {
             assertTrue(grid.get(2, y))
         }
+    }
+
+    @Test
+    fun `buildCustomGrid parses binary pixels and falls back to empty grid`() {
+        val binary = CharArray(169) { '0' }.also {
+            it[0] = '1'
+            it[168] = '1'
+        }.concatToString()
+
+        val grid = FrameBuilders.buildCustomGrid(binary)
+        val invalid = FrameBuilders.buildCustomGrid("invalid")
+
+        assertTrue(grid.get(0, 0))
+        assertTrue(grid.get(12, 12))
+        assertFalse(invalid.get(0, 0))
+        assertFalse(invalid.get(12, 12))
     }
 }

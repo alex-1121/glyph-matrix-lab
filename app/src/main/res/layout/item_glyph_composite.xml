@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_margin"
+    android:background="@drawable/bg_glyph_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="@dimen/card_padding">
+
+    <TextView
+        android:id="@+id/compositeName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/glyph_composite_name"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/compositeDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/glyph_composite_desc"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp" />
+</LinearLayout>
