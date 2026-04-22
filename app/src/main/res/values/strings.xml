@@ -21,6 +21,9 @@
     <string name="glyph_composite_desc">Digital Clock, Equalizer, Call status indicator</string>
     <string name="create_new_image">+ Create New Image</string>
     <string name="available_glyphs">Available Glyphs</string>
+    <string name="showcase_matrix_lab_logo_name">Matrix Lab Logo</string>
+    <string name="showcase_cross_example_name">Cross Example</string>
+    <string name="showcase_dollar_icon_name">Dollar Icon</string>
     <string name="selected_badge">Selected</string>
     <string name="untitled_image">Untitled Image</string>
 
@@ -30,7 +33,7 @@
     <string name="btn_delete">Delete</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_clear">Clear</string>
-    <string name="editor_instructions_interactive">Tap pixels to toggle. Grey X marks are not editable.</string>
+    <string name="editor_instructions_interactive">Tap pixels one by one to toggle.</string>
     <string name="editor_instructions_view">Viewing image</string>
     <string name="editor_title_create">Create Image</string>
     <string name="editor_title_view">View Image</string>

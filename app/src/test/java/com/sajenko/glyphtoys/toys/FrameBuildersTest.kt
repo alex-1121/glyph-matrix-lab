@@ -92,4 +92,28 @@ class FrameBuildersTest {
             assertTrue(grid.get(2, y))
         }
     }
+
+    @Test
+    fun `showcase icon builders light icon pixels only`() {
+        val dollar = FrameBuilders.buildDollarIconGrid()
+        assertTrue(dollar.get(6, 1))
+        assertTrue(dollar.get(4, 2))
+        assertTrue(dollar.get(8, 10))
+        assertFalse(dollar.get(0, 0))
+        assertFalse(dollar.get(4, 0))
+
+        val lab = FrameBuilders.buildLabIconGrid()
+        assertTrue(lab.get(4, 1))
+        assertTrue(lab.get(2, 11))
+        assertTrue(lab.get(10, 11))
+        assertFalse(lab.get(0, 0))
+        assertFalse(lab.get(6, 0))
+
+        val logo = FrameBuilders.buildAppLogoGrid()
+        assertTrue(logo.get(6, 1))
+        assertTrue(logo.get(3, 3))
+        assertTrue(logo.get(11, 6))
+        assertFalse(logo.get(0, 0))
+        assertFalse(logo.get(4, 0))
+    }
 }

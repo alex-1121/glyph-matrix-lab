@@ -13,16 +13,8 @@ object FrameBuilders {
     }
 
     fun buildCallGrid(frameIndex: Int = 0): PixelGrid {
-        val grid = PixelGrid()
         val rows = CALL_FRAMES[frameIndex.coerceIn(0, CALL_FRAME_COUNT - 1)]
-        rows.forEachIndexed { y, row ->
-            row.forEachIndexed { x, pixel ->
-                if (pixel == '#') {
-                    grid.set(x, y)
-                }
-            }
-        }
-        return grid
+        return buildGrid(rows, litPixel = '#')
     }
 
     fun buildEqualizerGrid(heights: IntArray): PixelGrid {
@@ -41,6 +33,30 @@ object FrameBuilders {
         return grid
     }
 
+    fun buildDollarIconGrid(): PixelGrid {
+        return buildGrid(DOLLAR_EXAMPLE.first(), litPixel = 'o')
+    }
+
+    fun buildLabIconGrid(): PixelGrid {
+        return buildGrid(MATRIX_LAB_ICON.first(), litPixel = 'o')
+    }
+
+    fun buildAppLogoGrid(): PixelGrid {
+        return buildGrid(CROSS_EXAMPLE.first(), litPixel = 'o')
+    }
+
+    private fun buildGrid(rows: Array<String>, litPixel: Char): PixelGrid {
+        val grid = PixelGrid()
+        rows.forEachIndexed { y, row ->
+            row.forEachIndexed { x, pixel ->
+                if (pixel == litPixel) {
+                    grid.set(x, y)
+                }
+            }
+        }
+        return grid
+    }
+
     private fun drawDigit(grid: PixelGrid, digit: Int, xOff: Int, yOff: Int) {
         val rows = FONT.getOrNull(digit) ?: return
         rows.forEachIndexed { row, pattern ->
@@ -51,6 +67,61 @@ object FrameBuilders {
             }
         }
     }
+
+    private val MATRIX_LAB_ICON = arrayOf(
+        arrayOf(
+            "xxxx.....xxxx",
+            "xx..ooooo..xx",
+            "x..o.....o..x",
+            "x...o...o...x",
+            "....o...o....",
+            "....o...o....",
+            "....o...o....",
+            "...o.....o...",
+            "..o.......o..",
+            "xo.........ox",
+            "xo.........ox",
+            "xxoooooooooxx",
+            "xxxx.....xxxx",
+        ),
+    )
+
+    private val CROSS_EXAMPLE = arrayOf(
+        arrayOf(
+            "xxxx.....xxxx",
+            "xx....o....xx",
+            "x.....o.....x",
+            "x..ooooooo..x",
+            "...o..o..o...",
+            "...o..o..o...",
+            ".ooooooooooo.",
+            "...o..o..o...",
+            "...o..o..o...",
+            "x..ooooooo..x",
+            "x.....o.....x",
+            "xx....o....xx",
+            "xxxx.....xxxx",
+
+        ),
+    )
+
+    private val DOLLAR_EXAMPLE = arrayOf(
+        arrayOf(
+            "xxxx.....xxxx",
+            "xx....o....xx",
+            "x...ooooo...x",
+            "x..oo.o.o...x",
+            "...oo.o.oo...",
+            "...oooo......",
+            "....ooooo....",
+            "......oooo...",
+            "......o.oo...",
+            "x..oo.o.oo..x",
+            "x...ooooo...x",
+            "xx....o....xx",
+            "xxxx.....xxxx",
+        ),
+    )
 
     private val CALL_FRAMES = arrayOf(
         arrayOf(

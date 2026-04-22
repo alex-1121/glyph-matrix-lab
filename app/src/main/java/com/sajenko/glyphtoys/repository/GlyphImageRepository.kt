@@ -70,6 +70,22 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         editor.commit()
     }
 
+    fun seedImagesOnce(seedVersionKey: String, version: Int, images: List<CustomGlyphImage>) {
+        if (prefs.getInt(seedVersionKey, 0) >= version) {
+            return
+        }
+
+        images.forEach { image ->
+            if (getImage(image.id) == null) {
+                saveImage(image)
+            }
+        }
+
+        prefs.edit()
+            .putInt(seedVersionKey, version)
+            .commit()
+    }
+
     fun setActiveSelection(selection: ActiveGlyphSelection) {
         if (getImage(selection.imageId) == null) {
             clearActiveSelection()

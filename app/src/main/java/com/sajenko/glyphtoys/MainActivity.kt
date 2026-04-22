@@ -39,6 +39,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         repository = GlyphImageRepository(
             getSharedPreferences(GlyphImageRepository.PreferencesName, Context.MODE_PRIVATE),
         )
+        ShowcaseGlyphImages.seedIfNeeded(this, repository)
         bindViews()
         permissionSettingsButton.setOnClickListener { openAppSettings() }
         ensureAudioPermission()
@@ -140,6 +141,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
     private fun rebuildGlyphList() {
         glyphListContainer.removeAllViews()
         addCompositeItem()
+        addCreateNewItem()
         val activeId = repository.getActiveSelection()?.imageId
         repository.getAllImages().forEach { image ->
             val item = layoutInflater.inflate(R.layout.item_glyph_image, glyphListContainer, false)
@@ -164,7 +166,6 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             }
             glyphListContainer.addView(item)
         }
-        addCreateNewItem()
     }
 
     private fun addCompositeItem() {
