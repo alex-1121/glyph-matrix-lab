@@ -46,9 +46,6 @@
     <string name="priority_idle_only">Idle Only</string>
     <string name="priority_idle_desc">Choose <b>Composite Glyph (Idle Only)</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
 
-    <string name="toast_idle_configured">Image configured. Select Composite Glyph Toy in Settings - Glyph - AOD Toy.</string>
-    <string name="toast_static_configured">Image configured. Select Static Image Toy in Settings - Glyph - AOD Toy.</string>
-
     <string name="delete_dialog_title">Delete Image?</string>
     <string name="delete_dialog_message">This action cannot be undone.</string>
     <string name="delete_confirm">Delete</string>

@@ -12,7 +12,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
 import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
@@ -209,12 +208,6 @@ class ImageEditorActivity : Activity() {
                 updatedAt = System.currentTimeMillis(),
             ),
         )
-        val toastRes = if (priority == DisplayPriority.IDLE_ONLY) {
-            R.string.toast_idle_configured
-        } else {
-            R.string.toast_static_configured
-        }
-        Toast.makeText(this, toastRes, Toast.LENGTH_LONG).show()
         openAodToyPicker()
     }
 
@@ -241,7 +234,7 @@ class ImageEditorActivity : Activity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            // The toast above is the fallback path on non-Nothing devices.
+            // The AOD toy picker is only available on supported Nothing devices.
         }
     }
 
