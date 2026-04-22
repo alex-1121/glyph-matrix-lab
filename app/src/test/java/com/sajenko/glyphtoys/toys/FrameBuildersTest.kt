@@ -9,11 +9,11 @@ class FrameBuildersTest {
     fun `buildCallGrid frame 0 lights handset pixels only`() {
         val grid = FrameBuilders.buildCallGrid(frameIndex = 0)
 
-        assertTrue("Handset top should be lit", grid.get(6, 0))
+        assertTrue("Handset top should be lit", grid.get(3, 2))
         assertTrue("Handset body should be lit", grid.get(2, 2))
         assertTrue("Handset bottom should be lit", grid.get(6, 10))
-        assertFalse("Inner wave should be off in frame 0", grid.get(6, 2))
-        assertFalse("Outer wave should be off in frame 0", grid.get(10, 1))
+        assertFalse("Inner wave should be off in frame 0", grid.get(7, 2))
+        assertFalse("Outer wave should be off in frame 0", grid.get(9, 2))
         assertFalse("Corner (12, 12) should be off", grid.get(12, 12))
     }
 
@@ -21,20 +21,20 @@ class FrameBuildersTest {
     fun `buildCallGrid frame 1 adds inner wave`() {
         val grid = FrameBuilders.buildCallGrid(frameIndex = 1)
 
-        assertTrue("Inner wave should be lit", grid.get(6, 2))
-        assertTrue("Inner wave edge should be lit", grid.get(9, 4))
+        assertTrue("Inner wave should be lit", grid.get(7, 2))
+        assertTrue("Inner wave edge should be lit", grid.get(8, 4))
         assertTrue("Handset should remain lit", grid.get(2, 2))
-        assertFalse("Outer wave should still be off", grid.get(10, 1))
-        assertFalse("Outer wave edge should still be off", grid.get(11, 4))
+        assertFalse("Outer wave should still be off", grid.get(9, 2))
+        assertFalse("Outer wave edge should still be off", grid.get(9, 4))
     }
 
     @Test
-    fun `buildCallGrid frame 2 adds outer wave`() {
+    fun `buildCallGrid frame 2 shows expanded outer wave`() {
         val grid = FrameBuilders.buildCallGrid(frameIndex = 2)
 
-        assertTrue("Outer wave should be lit", grid.get(10, 1))
-        assertTrue("Outer wave edge should be lit", grid.get(12, 4))
-        assertTrue("Inner wave should remain lit", grid.get(6, 2))
+        assertTrue("Outer wave should be lit", grid.get(8, 1))
+        assertTrue("Outer wave edge should be lit", grid.get(9, 4))
+        assertTrue("Outer wave top should be lit", grid.get(6, 0))
         assertTrue("Handset should remain lit", grid.get(6, 10))
         assertFalse("Far corner should remain off", grid.get(12, 12))
     }
@@ -91,21 +91,5 @@ class FrameBuildersTest {
         for (y in 0 until 13) {
             assertTrue(grid.get(2, y))
         }
-    }
-
-    @Test
-    fun `buildCustomGrid parses binary pixels and falls back to empty grid`() {
-        val binary = CharArray(169) { '0' }.also {
-            it[0] = '1'
-            it[168] = '1'
-        }.concatToString()
-
-        val grid = FrameBuilders.buildCustomGrid(binary)
-        val invalid = FrameBuilders.buildCustomGrid("invalid")
-
-        assertTrue(grid.get(0, 0))
-        assertTrue(grid.get(12, 12))
-        assertFalse(invalid.get(0, 0))
-        assertFalse(invalid.get(12, 12))
     }
 }

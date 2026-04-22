@@ -36,12 +36,6 @@ class GlyphMatrixView @JvmOverloads constructor(
             invalidate()
         }
 
-    var showGrid: Boolean = true
-        set(value) {
-            field = value
-            invalidate()
-        }
-
     var onPixelToggled: ((x: Int, y: Int) -> Unit)? = null
 
     private val offPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -52,14 +46,12 @@ class GlyphMatrixView @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.pixel_on)
         style = Paint.Style.FILL
     }
-    private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = ContextCompat.getColor(context, R.color.grid_line)
-        strokeWidth = resources.getDimension(R.dimen.grid_line_width)
-        style = Paint.Style.STROKE
-    }
 
     private val cellRect = RectF()
-    private val pixelPadding = resources.getDimension(R.dimen.pixel_padding)
+
+    init {
+        setBackgroundColor(ContextCompat.getColor(context, R.color.black))
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
@@ -80,7 +72,7 @@ class GlyphMatrixView @JvmOverloads constructor(
         val gridWidth = cellSize * size
         val startX = (width - gridWidth) / 2f
         val startY = (height - gridWidth) / 2f
-        val cellInset = if (showGrid) pixelPadding else 0f
+        val cellInset = cellSize / 12f
 
         for (y in 0 until size) {
             for (x in 0 until size) {
@@ -108,10 +100,6 @@ class GlyphMatrixView @JvmOverloads constructor(
                     cellRect,
                     if (lit) onPaint else offPaint,
                 )
-
-                if (showGrid && !lit) {
-                    canvas.drawRect(cellRect, gridPaint)
-                }
             }
         }
     }

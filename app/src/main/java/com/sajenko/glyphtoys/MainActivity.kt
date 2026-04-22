@@ -70,7 +70,6 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         permissionSettingsButton = findViewById(R.id.permissionSettingsButton)
         configuredLabel = findViewById(R.id.configuredLabel)
         configuredMatrixView = findViewById(R.id.configuredMatrixView)
-        configuredMatrixView.showGrid = false
         glyphListContainer = findViewById(R.id.glyphListContainer)
     }
 
@@ -152,7 +151,6 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             thumbnail.pixelGrid = GlyphImageSerializer.binaryToPixelGrid(image.pixels) ?: PixelGrid()
             thumbnail.maskedGrid = null
             thumbnail.interactiveMode = false
-            thumbnail.showGrid = false
             name.text = image.name
             val selection = repository.getActiveSelection()
             mode.text = if (selection?.imageId == image.id) {
