@@ -18,7 +18,7 @@
     <string name="live_mode_static_image">Static Image</string>
     <string name="no_selection">Not selected</string>
     <string name="glyph_composite_name">Composite Glyph</string>
-    <string name="glyph_composite_desc">Clock, Equalizer, Call indicator</string>
+    <string name="glyph_composite_desc">Digital Clock, Equalizer, Call status indicator</string>
     <string name="create_new_image">+ Create New Image</string>
     <string name="available_glyphs">Available Glyphs</string>
     <string name="selected_badge">Selected</string>

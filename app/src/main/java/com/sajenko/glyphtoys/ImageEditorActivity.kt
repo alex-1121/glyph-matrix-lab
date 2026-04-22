@@ -63,6 +63,7 @@ class ImageEditorActivity : Activity() {
     }
 
     private fun bindViews() {
+        findViewById<View>(R.id.editorRoot).applySystemBarsPadding()
         titleView = findViewById(R.id.editorTitle)
         matrixView = findViewById(R.id.editorMatrixView)
         instructionsView = findViewById(R.id.editorInstructions)

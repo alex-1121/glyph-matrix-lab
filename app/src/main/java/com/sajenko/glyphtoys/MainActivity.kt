@@ -65,6 +65,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
     }
 
     private fun bindViews() {
+        findViewById<View>(R.id.mainRoot).applySystemBarsPadding()
         permissionStatus = findViewById(R.id.permissionStatus)
         permissionSettingsButton = findViewById(R.id.permissionSettingsButton)
         configuredLabel = findViewById(R.id.configuredLabel)
