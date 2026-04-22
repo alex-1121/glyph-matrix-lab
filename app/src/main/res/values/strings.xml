@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Matrix Lab</string>
-    <string name="toy_name_composite">Composite Glyph</string>
-    <string name="toy_summary_composite">Digital Clock, Equalizer, Call status indicator</string>
-    <string name="toy_name_static">Matrix Lab: Multi-feature</string>
-    <string name="toy_summary_static">Matrix Lab: Image</string>
+    <string name="toy_name_composite">Matrix Lab: Multi function</string>
+    <string name="toy_summary_composite">Digital Clock (or your image), Equalizer, Call status indicator.</string>
+    <string name="toy_name_static">Matrix Lab: Static image</string>
+    <string name="toy_summary_static">Image of your choice.</string>
 
     <string name="permission_status_granted">Audio permission granted</string>
     <string name="permission_status_denied">Audio permission required for the equalizer to work.</string>
@@ -44,7 +44,7 @@
     <string name="priority_always_on">Always On</string>
     <string name="priority_always_desc">Choose <b>Static Image</b> on the next screen. Keeps this image on the Glyph Matrix.</string>
     <string name="priority_idle_only">Idle Only</string>
-    <string name="priority_idle_desc">Choose <b>Composite Glyph</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
+    <string name="priority_idle_desc">Choose <b>Composite Glyph (Idle Only)</b> on the next screen. Calls and music override the image. Otherwise, this image replaces the digital clock.</string>
 
     <string name="toast_idle_configured">Image configured. Select Composite Glyph Toy in Settings - Glyph - AOD Toy.</string>
     <string name="toast_static_configured">Image configured. Select Static Image Toy in Settings - Glyph - AOD Toy.</string>
