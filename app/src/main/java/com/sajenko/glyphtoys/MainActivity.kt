@@ -105,10 +105,9 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
     private fun updatePermissionStatus() {
         val hasPermission = hasAudioPermission()
-        permissionStatus.text = if (hasPermission) {
-            getString(R.string.permission_status_granted)
-        } else {
-            getString(R.string.permission_status_denied)
+        permissionStatus.visibility = if (hasPermission) View.GONE else View.VISIBLE
+        if (!hasPermission) {
+            permissionStatus.text = getString(R.string.permission_status_denied)
         }
         permissionSettingsButton.visibility = if (hasPermission) View.GONE else View.VISIBLE
     }

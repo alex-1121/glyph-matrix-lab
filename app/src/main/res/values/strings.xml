@@ -7,7 +7,7 @@
     <string name="toy_summary_static">Matrix Lab: Image</string>
 
     <string name="permission_status_granted">Audio permission granted</string>
-    <string name="permission_status_denied">Audio permission required for the equalizer.</string>
+    <string name="permission_status_denied">Audio permission required for the equalizer to work.</string>
     <string name="permission_open_settings">Open Settings</string>
     <string name="configured_display_label">Configured Image:</string>
     <string name="live_display_label">Live Preview:</string>
