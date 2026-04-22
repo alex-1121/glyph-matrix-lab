@@ -88,7 +88,7 @@ Only one toy can be active at a time. The master toggle is at the top of that sc
 
 ## Project Overview
 
-This is an Android app for creating Glyph Toys, which are services that render visuals on the Nothing Phone (4a) Pro 13x13 Glyph Matrix LED display. The app UI mainly exposes instructions; the core behavior lives in background services that are activated from device Settings.
+This is an Android app for creating Glyph Toys, which are services that render visuals on the Nothing Phone (4a) Pro 13x13 Glyph Matrix LED display. The launcher UI handles audio permission, shows the latest live toy frame when available, lists saved custom images, and provides a masked 13x13 image editor. Toy output still comes from background services activated from device Settings.
 
 SDK location:
 
@@ -131,9 +131,21 @@ Toys can delegate to pure abstractions that are testable without Robolectric:
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
 - `EqualizerProcessor` — waveform → bar heights with decay
-- `CompositeToyController` — orchestrates mode switching (CLOCK/EQUALIZER/CALL)
+- `CompositeToyController` — orchestrates mode switching (CALL/EQUALIZER/CUSTOM_IDLE/CLOCK)
+- `CustomGlyphProvider` / `RepositoryCustomGlyphProvider` — supplies selected idle custom images to the composite toy
+- `GlyphImageSerializer` — serializes custom 13x13 images as 169-character binary strings
 
 This separation enables fast JVM unit tests via `./gradlew testDebugUnitTest`.
+
+### App UI And Preview
+
+- `MainActivity` requests microphone permission, shows the latest in-process `LiveGlyphPreview` frame, and falls back to the configured custom image when no live frame exists.
+- `LiveGlyphPreview` is process-local memory. Force-stopping or reinstalling the app clears the latest frame until an active toy service publishes again.
+- `ImageEditorActivity` edits `MaskedPixelGrid.createWithPhoneMask()` so only valid Phone (4a) Pro matrix pixels can be toggled.
+- Saved images live in `GlyphImageRepository`; the active selection stores both `imageId` and `DisplayPriority`.
+- `DisplayPriority.IDLE_ONLY` means select **Composite Glyph** in the AOD picker; calls and music override the image, otherwise it replaces the clock.
+- `DisplayPriority.ALWAYS_ON` means select **Static Image** in the AOD picker; it keeps the selected image on the matrix until another system/toy priority overrides it.
+- `GlyphMatrixView` renders previews with sharp square cells, proportional black gaps, off-pixels `#1C1C1C`, and on-pixels white. Gaps are always present; there is no `showGrid` toggle or separate grid-line resource.
 
 ### Manifest Registration
 
@@ -243,15 +255,16 @@ Message format:
 
 ## Current Toys
 
-### CompositeToyService (Clock & Music)
+### CompositeToyService (Clock, Music, Calls, Custom Idle)
 
 Multi-mode toy with automatic display switching:
 
 - **CLOCK mode**: 4×5 pixel digits showing HH:MM, refreshes every minute via `onAod()`
-- **EQUALIZER mode**: 7-column audio-reactive equalizer using `Visualizer(0)` for real-time waveform data; bars smooth with 0.55 decay factor; graceful fallback to static bars if Visualizer fails
-- **CALL mode**: Phone icon displayed during calls (detected via `AudioManager.OnModeChangedListener`)
+- **EQUALIZER mode**: 13-column audio-reactive equalizer using `Visualizer(0)` for real-time waveform data; bars smooth with 0.55 decay factor; graceful fallback to static bars if Visualizer fails
+- **CALL mode**: Animated phone icon displayed during calls (detected via `AudioManager.OnModeChangedListener`)
+- **CUSTOM_IDLE mode**: Selected `IDLE_ONLY` custom image shown when there is no call or media playback
 
-Mode transitions are automatic: playback → EQUALIZER, call → CALL, idle → CLOCK.
+Mode transitions are automatic: call → CALL, playback → EQUALIZER, idle with selected idle image → CUSTOM_IDLE, otherwise idle → CLOCK.
 
 **Internal architecture:** The service delegates to `CompositeToyController` which operates on pure abstractions:
 
@@ -260,8 +273,20 @@ Mode transitions are automatic: playback → EQUALIZER, call → CALL, idle → 
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
 - `EqualizerProcessor` — waveform → bar heights with decay
+- `RepositoryCustomGlyphProvider` — reads the current `IDLE_ONLY` image from shared preferences
+- `LiveGlyphPreview` — publishes the current rendered grid back to the launcher process while the service is alive
 
 This separation allows JVM unit testing without Robolectric.
+
+### StaticImageToyService
+
+AOD toy for custom images selected with `DisplayPriority.ALWAYS_ON`:
+
+- Loads the active image from `GlyphImageRepository`
+- Renders the image through `GlyphDisplayAdapter`
+- Re-renders on `onAod()` and relevant shared-preference changes
+- Displays an empty grid when there is no active `ALWAYS_ON` image
+- Publishes `LiveGlyphPreview` frames with `LiveGlyphMode.STATIC_IMAGE`
 
 ## Troubleshooting
 
@@ -298,7 +323,7 @@ No waveform received within 1000ms of Visualizer startup; restarting meter
 
 - Min SDK is 34
 - The app targets Nothing Phone (4a) Pro only
-- The `.pp/` SDK is intentionally committed despite common ignore patterns
+- The `app/libs/glyph-matrix-sdk-2.0.aar` SDK is intentionally committed despite common ignore patterns
 - `GlyphMatrixFrame.Builder.build()` requires a `Context` in SDK 2.0+
 - Brightness range is `0..255`, not `0..4095`
 - A `GlyphMatrixFrame` supports at most 3 objects, one per layer: top, mid, low
@@ -309,6 +334,8 @@ No waveform received within 1000ms of Visualizer startup; restarting meter
 
 - Prefer preserving device-specific constraints over making the code generic
 - When adding a new toy, verify both manifest metadata and service wiring, not just rendering code
+- When changing custom image behavior, verify both the editor/repository flow and the AOD toy selection path (`Composite Glyph` for idle-only, `Static Image` for always-on)
+- When changing `GlyphMatrixView`, verify MainActivity previews, thumbnails, editor rendering, and touch toggling on device or with screenshots
 - For behavior changes, run at least `./gradlew testDebugUnitTest` or `./gradlew test`, then verify the actual device activation path when hardware is available
 - Finish any toy addition or behavior change by running `./gradlew installDebug` to deploy the updated app to the connected device
 - After deployment, open the AOD toy picker with `adb shell am start -n com.nothing.thirdparty/com.nothing.thirdparty.matrix.toys.manager.AodToySelectActivity` so the updated toy can be selected immediately
