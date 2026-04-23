@@ -1,22 +1,40 @@
 # Matrix Lab
 
-An Android app for creating and managing Glyph Toys on the Nothing Phone (4a) Pro 13x13 Glyph Matrix LED display.
+An Android app for creating and managing Glyph Toys on the Nothing Phone (4a) Pro Glyph Matrix LED display.
 
 Create custom 13x13 pixel images, save multiple designs, choose one for display.
 
 ## Features
 
-<img width="640" height="551" alt="eq" src="https://github.com/user-attachments/assets/08072335-a6b1-4e60-b501-f9df219c660d" />
+### Glyph Matrix Image editor
 
-- Live preview on the app's home screen — mirrors what the Glyph Matrix is displaying in real time
-- Audio permission management for the reactive equalizer
-- List of saved custom glyph images. Includes few sample images.
-- 13x13 pixel image editor
-- Display mode selection per image:
+Create your images, save/edit them, choose how they are displayed on your Glyph Matrix. Includes few sample images.
+
+<img width="448" height="692" alt="edit" src="https://github.com/user-attachments/assets/bcf3f505-ac8d-453b-b015-c0fadf328891" />
+
+### Composite Glyph - Digital Clock, Equalizer, Call status indicator
+
+Switching between functions happens automatically. Digital Clock can be replaced with your custom image.
+
+<img width="448" height="386" alt="eq" src="https://github.com/user-attachments/assets/03a878e6-5342-41be-8dee-a7c4e29d4ae3" />
+
+<img width="448" height="389" alt="call" src="https://github.com/user-attachments/assets/07413de5-6881-4a7d-846f-0504f1a12fbe" />
+
+### Live preview — mirrors what the Glyph Matrix is displaying in real time
+
+<img width="448" height="853" alt="clock_live_preview" src="https://github.com/user-attachments/assets/d0734eef-a455-481f-a811-cd35d123ccd4" />
+
+### Display Modes - Idle Only and Always On
   - **Idle Only**: shown by the multi-function toy when the phone is idle
   - **Always On**: shown by the static image toy at all times
-- AOD toy setup guidance
-- Two AOD Glyph Toys: **Matrix Lab: Multi function** and **Matrix Lab: Static image**
+
+<img width="576" height="634" alt="modes" src="https://github.com/user-attachments/assets/a846b0f6-fd5e-4c1d-be22-3c60aee52698" />
+
+### AOD Glyph Toy setup guidance
+
+If your image is not displayed - there's a useful setup notice on app's main screen. It tells you which AOD Toy setting to set and where. If message is not gone after change, turn your Glyph Interface off and on. This is a workaround for OS bug/limitation.
+
+<img width="586" height="896" alt="setup guidance" src="https://github.com/user-attachments/assets/45cb6cc1-ce48-4099-8059-a1b876efa3fd" />
 
 ## Glyph Toys
 
