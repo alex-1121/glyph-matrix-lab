@@ -6,7 +6,9 @@ Create custom 13x13 pixel images, save multiple designs, choose one for display.
 
 ## Features
 
-- Live preview on the home screen — mirrors what the Glyph Matrix is displaying in real time
+<img width="640" height="551" alt="eq" src="https://github.com/user-attachments/assets/08072335-a6b1-4e60-b501-f9df219c660d" />
+
+- Live preview on the app's home screen — mirrors what the Glyph Matrix is displaying in real time
 - Audio permission management for the reactive equalizer
 - List of saved custom glyph images. Includes few sample images.
 - 13x13 pixel image editor
