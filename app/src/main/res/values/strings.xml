@@ -20,7 +20,7 @@
     <string name="no_selection">Not selected</string>
     <string name="glyph_composite_name">Composite Glyph</string>
     <string name="aod_warning_title">AOD setup needed</string>
-    <string name="aod_warning_message">Select %1$s in AOD settings. If this warning persists, turn Glyph Interface on and off.</string>
+    <string name="aod_warning_message">Select %1$s in AOD settings. If this warning persists, turn Glyph Interface off and on.</string>
     <string name="aod_warning_open_settings">Open AOD settings</string>
     <string name="glyph_composite_desc">Digital Clock, Equalizer, Call status indicator</string>
     <string name="create_new_image">+ Create New Image</string>
