@@ -54,7 +54,7 @@
                 android:resource="@string/toy_name_composite" />
             <meta-data
                 android:name="com.nothing.glyph.toy.image"
-                android:resource="@drawable/toy_preview_composite" />
+                android:resource="@drawable/ic_launcher_round" />
             <meta-data
                 android:name="com.nothing.glyph.toy.summary"
                 android:resource="@string/toy_summary_composite" />
@@ -77,7 +77,7 @@
                 android:resource="@string/toy_name_static" />
             <meta-data
                 android:name="com.nothing.glyph.toy.image"
-                android:resource="@drawable/toy_preview_static" />
+                android:resource="@drawable/ic_launcher_round" />
             <meta-data
                 android:name="com.nothing.glyph.toy.summary"
                 android:resource="@string/toy_summary_static" />
