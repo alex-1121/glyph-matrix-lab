@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.sajenko.glyphtoys"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.sajenko.glyphtoys"
         minSdk = 34
-        targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        targetSdk = 36
+        versionCode = 6
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
