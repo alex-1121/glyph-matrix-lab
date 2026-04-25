@@ -15,6 +15,10 @@ app/build/
 *.hprof
 captures/
 local.properties
+*.jks
+*.keystore
+keystore.properties
+signing.properties
 
 # Kotlin compilation caches
 **/.kotlin/
