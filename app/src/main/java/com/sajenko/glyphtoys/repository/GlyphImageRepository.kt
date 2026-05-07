@@ -133,6 +133,42 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
             .commit()
     }
 
+    // ------------------------------------------------------------------
+    // Scrolling text
+    // ------------------------------------------------------------------
+
+    fun getScrollingText(): String? {
+        return prefs.getString(KeyScrollingText, null)
+    }
+
+    fun isScrollingTextEnabled(): Boolean {
+        return prefs.getBoolean(KeyScrollingTextEnabled, false)
+    }
+
+    fun getScrollingTextSpeed(): Int {
+        return prefs.getInt(KeyScrollingTextSpeed, 60) // Default 60 WPM
+    }
+
+    fun getScrollingTextMode(): String {
+        return prefs.getString(KeyScrollingTextMode, "PERSISTENT") ?: "PERSISTENT"
+    }
+
+    fun setScrollingText(text: String, enabled: Boolean, speed: Int = 60, mode: String = "PERSISTENT") {
+        prefs.edit()
+            .putString(KeyScrollingText, text)
+            .putBoolean(KeyScrollingTextEnabled, enabled)
+            .putInt(KeyScrollingTextSpeed, speed)
+            .putString(KeyScrollingTextMode, mode)
+            .commit()
+    }
+
+    fun clearScrollingText() {
+        prefs.edit()
+            .remove(KeyScrollingText)
+            .putBoolean(KeyScrollingTextEnabled, false)
+            .commit()
+    }
+
     fun registerChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }
@@ -155,6 +191,10 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         const val KeyActiveSelectionId = "active_selection_id"
         const val KeyActiveSelectionMode = "active_selection_mode"
         const val KeyActiveSelectionUpdated = "active_selection_updated"
+        const val KeyScrollingText = "scrolling_text_content"
+        const val KeyScrollingTextEnabled = "scrolling_text_enabled"
+        const val KeyScrollingTextSpeed = "scrolling_text_speed"
+        const val KeyScrollingTextMode = "scrolling_text_mode"
         private const val MissingTimestamp = -1L
 
         fun imageNameKey(id: String): String = "image_${id}_name"
