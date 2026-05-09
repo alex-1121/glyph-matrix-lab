@@ -4,6 +4,7 @@ import kotlin.math.roundToInt
 
 enum class DisplayMode {
     CALL,
+    SCROLLING_TEXT,
     CLOCK,
     CUSTOM_IDLE,
     EQUALIZER,
@@ -20,6 +21,7 @@ class CompositeToyController(
     private val stateProvider: SystemStateProvider,
     private val timeProvider: TimeProvider = SystemTimeProvider,
     private val customGlyphProvider: CustomGlyphProvider = EmptyCustomGlyphProvider,
+    private val scrollingTextProvider: ScrollingTextProvider = EmptyScrollingTextProvider,
     private val liveFrameReporter: (PixelGrid, DisplayMode) -> Unit = { _, _ -> },
 ) {
     private var lastRenderedMode: DisplayMode? = null
@@ -33,9 +35,20 @@ class CompositeToyController(
         return when {
             stateProvider.isCallActive -> DisplayMode.CALL
             stateProvider.isMediaPlaying -> DisplayMode.EQUALIZER
+            scrollingTextProvider.isScrollingTextActive() -> DisplayMode.SCROLLING_TEXT
             customGlyphProvider.idleImageGrid() != null -> DisplayMode.CUSTOM_IDLE
             else -> DisplayMode.CLOCK
         }
+    }
+
+    /** Called by the service's scroll tick to advance and display the next frame. */
+    fun renderScrollingTextFrame() {
+        if (currentMode() != DisplayMode.SCROLLING_TEXT) return
+        val frame = scrollingTextProvider.nextScrollFrame()
+        display(DisplayMode.SCROLLING_TEXT, frame)
+        lastRenderedMode = DisplayMode.SCROLLING_TEXT
+        lastRenderedMinute = timeProvider.minute()
+        lastRenderedCallFrameIndex = -1
     }
 
     fun render(force: Boolean = false, callFrameIndex: Int = 0): RenderResult {
@@ -56,6 +69,13 @@ class CompositeToyController(
                 mode,
                 FrameBuilders.buildClockGrid(timeProvider.hour(), minute),
             )
+            DisplayMode.SCROLLING_TEXT -> {
+                // The scroll tick calls renderScrollingTextFrame() which advances the scroller.
+                // Here we only show the current frame without advancing so forced re-renders
+                // (e.g. on mode switch) don't skip frames.
+                val frame = scrollingTextProvider.currentFrame()
+                display(mode, frame)
+            }
             DisplayMode.CUSTOM_IDLE -> {
                 val grid = customGlyphProvider.idleImageGrid()
                 if (grid != null) {

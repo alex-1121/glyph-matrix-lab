@@ -73,4 +73,18 @@
     <string name="composite_feature_call_title">Call Indicator</string>
     <string name="composite_feature_call_desc">Shows a phone icon on the matrix during active calls. This has the highest priority and overrides all other modes.</string>
     <string name="composite_feature_call_preview">Call indicator preview on Glyph Matrix</string>
+
+    <!-- Scrolling Text -->
+    <string name="scrolling_text_card_name">Scrolling Text</string>
+    <string name="scrolling_text_card_desc">Scroll custom text across the Glyph Matrix when idle</string>
+    <string name="scrolling_text_dialog_title">Set Scrolling Text</string>
+    <string name="scrolling_text_dialog_hint">Enter your message (A–Z, 0–9)</string>
+    <string name="scrolling_text_btn_enable">Enable &amp; Set Text</string>
+    <string name="scrolling_text_btn_disable">Disable Scrolling Text</string>
+    <string name="scrolling_text_active_badge">Active</string>
+    <string name="scrolling_text_current_label">Current text:</string>
+    <string name="scrolling_text_none">None</string>
+    <string name="live_mode_scrolling_text">Scrolling Text</string>
+    <string name="toast_scrolling_text_enabled">Scrolling text enabled</string>
+    <string name="toast_scrolling_text_disabled">Scrolling text disabled</string>
 </resources>
