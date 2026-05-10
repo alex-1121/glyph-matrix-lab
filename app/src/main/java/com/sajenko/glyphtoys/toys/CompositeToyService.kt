@@ -58,13 +58,13 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             val provider = scrollingTextProvider ?: return
             if (!provider.isScrollingTextActive()) return
 
-            if (repository.getScrollingTextMode() == "ONCE" && provider.hasFinishedCycle()) {
+            if (repository.getScrollingTextMode() == GlyphImageRepository.ScrollingModeOnce && provider.hasFinishedCycle()) {
                 // If we finished one full scroll in 'ONCE' mode, disable it and go back to clock
                 repository.setScrollingText(
                     text = repository.getScrollingText().orEmpty(),
                     enabled = false,
                     speed = repository.getScrollingTextSpeed(),
-                    mode = "ONCE"
+                    mode = GlyphImageRepository.ScrollingModeOnce
                 )
                 // The pref listener will trigger provider.refresh() and stop the tick
                 return
@@ -341,7 +341,9 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             key == GlyphImageRepository.KeyActiveSelectionMode ||
             key == GlyphImageRepository.KeyImageList ||
             key == GlyphImageRepository.KeyScrollingText ||
-            key == GlyphImageRepository.KeyScrollingTextEnabled
+            key == GlyphImageRepository.KeyScrollingTextEnabled ||
+            key == GlyphImageRepository.KeyScrollingTextSpeed ||
+            key == GlyphImageRepository.KeyScrollingTextMode
         ) {
             return true
         }

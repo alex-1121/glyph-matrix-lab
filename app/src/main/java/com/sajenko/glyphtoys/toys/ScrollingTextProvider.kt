@@ -43,13 +43,10 @@ class RepositoryScrollingTextProvider(
         enabled = repository.isScrollingTextEnabled() && text.isNotEmpty()
         scroller = if (enabled && text.isNotEmpty()) TextScroller(text) else null
         
-        // Convert WPM to delay. 60 WPM -> ~50ms per pixel.
-        // Formula: Delay = (3000 / WPM)
-        // 60 WPM -> 50ms
-        // 120 WPM -> 25ms
-        // 30 WPM -> 100ms
-        val wpm = repository.getScrollingTextSpeed().coerceIn(10, 300)
-        scrollDelayMs = (3000L / wpm).coerceIn(10, 500)
+        // Map user-facing speed scale 1-10 to scroll delay.
+        // Speed 1 = slowest (longest delay), Speed 10 = fastest (shortest delay).
+        val speed = repository.getScrollingTextSpeed().coerceIn(1, 10)
+        scrollDelayMs = (150L / speed).coerceIn(15L, 150L)
     }
 
     override fun isScrollingTextActive(): Boolean = enabled && scroller != null

@@ -87,4 +87,10 @@
     <string name="live_mode_scrolling_text">Scrolling Text</string>
     <string name="toast_scrolling_text_enabled">Scrolling text enabled</string>
     <string name="toast_scrolling_text_disabled">Scrolling text disabled</string>
+    <string name="scrolling_text_speed_mode">Speed: %1$d (%2$s)</string>
+    <string name="scrolling_text_speed">Speed: %1$d</string>
+    <string name="scrolling_text_speed_default">Speed: 5</string>
+    <string name="scrolling_text_display_duration">Display Duration</string>
+    <string name="scrolling_text_mode_once">Show Once</string>
+    <string name="scrolling_text_mode_persistent">Loop Forever</string>
 </resources>

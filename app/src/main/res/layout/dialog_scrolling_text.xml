@@ -28,7 +28,7 @@
         android:id="@+id/labelSpeed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Speed: 60 WPM"
+        android:text="@string/scrolling_text_speed_default"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:layout_marginTop="20dp"
@@ -38,13 +38,13 @@
         android:id="@+id/speedSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="240"
-        android:progress="60" />
+        android:max="9"
+        android:progress="4" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Display Duration"
+        android:text="@string/scrolling_text_display_duration"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:layout_marginTop="20dp"
@@ -60,7 +60,7 @@
             android:id="@+id/radioPersistent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Loop Forever"
+            android:text="@string/scrolling_text_mode_persistent"
             android:textColor="@color/white"
             android:checked="true" />
 
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Show Once"
+            android:text="@string/scrolling_text_mode_once"
             android:textColor="@color/white" />
 
     </RadioGroup>

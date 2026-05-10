@@ -13,29 +13,6 @@ object GlyphFont {
     private const val CHAR_SPACING = 1 // blank columns between chars
 
     /**
-     * Convert a text string into a wide PixelGrid whose width = sum of all character widths + spacing.
-     * The height is always 13 (to match the display), with the text vertically centred (row offset 4).
-     */
-    fun buildTextGrid(text: String): PixelGrid {
-        val upper = text.uppercase()
-        if (upper.isEmpty()) return PixelGrid()
-
-        // Calculate total width
-        val chars = upper.map { fontFor(it) }
-        val totalWidth = chars.sumOf { it[0].length } + (chars.size - 1) * CHAR_SPACING
-        val displayWidth = maxOf(totalWidth, 1)
-
-        val grid = PixelGrid(size = displayWidth) // we use a square PixelGrid with custom size-like width below
-        // Actually PixelGrid is always 13x13, so we need a flat bool array approach.
-        // We'll use a custom wide grid representation via a BooleanArray instead.
-        // Return a WidePixelGrid via an extension – but since PixelGrid is fixed 13x13,
-        // we pack the text into a wider structure and expose via TextScroller.
-        // This helper is for TextScroller internal use only — return PixelGrid is a lie here,
-        // so we use the actual flat array. See TextScroller for usage.
-        return grid // placeholder — use buildTextBitmap() for the actual flat array
-    }
-
-    /**
      * Returns a 2D boolean array [row][col] where row ∈ [0, CHAR_HEIGHT) and col ∈ [0, totalWidth).
      * This is what TextScroller uses to produce 13x13 PixelGrid windows.
      */
@@ -175,11 +152,11 @@ object GlyphFont {
             "#...#",
         ),
         'N' to arrayOf(
-            "#.#",
-            "##.",
-            "#.#",
-            "#.#",
-            "#.#",
+            "#..#",
+            "##.#",
+            "#.##",
+            "#..#",
+            "#..#",
         ),
         'O' to arrayOf(
             ".#.",
@@ -228,13 +205,13 @@ object GlyphFont {
             "#.#",
             "#.#",
             "#.#",
-            ".#.",
+            "###",
         ),
         'V' to arrayOf(
             "#.#",
             "#.#",
             "#.#",
-            ".#.",
+            "#.#",
             ".#.",
         ),
         'W' to arrayOf(
