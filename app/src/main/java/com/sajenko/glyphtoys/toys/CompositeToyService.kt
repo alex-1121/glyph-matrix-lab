@@ -30,7 +30,9 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
     private var controller: CompositeToyController? = null
     private lateinit var repository: GlyphImageRepository
     private var customGlyphProvider: RepositoryCustomGlyphProvider? = null
+    private var scrollingTextProvider: RepositoryScrollingTextProvider? = null
     private var callAnimationStep = 0
+    private var scrollTextTickScheduled = false
 
     @Volatile
     private var latestRawHeights: IntArray = IntArray(EqualizerProcessor.BAR_COLUMNS.size)
@@ -47,6 +49,29 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         override fun run() {
             renderCurrentState(force = true)
             scheduleNextMinuteTick()
+        }
+    }
+
+    private val scrollTextTickRunnable = object : Runnable {
+        override fun run() {
+            scrollTextTickScheduled = false
+            val provider = scrollingTextProvider ?: return
+            if (!provider.isScrollingTextActive()) return
+
+            if (repository.getScrollingTextMode() == GlyphImageRepository.ScrollingModeOnce && provider.hasFinishedCycle()) {
+                // If we finished one full scroll in 'ONCE' mode, disable it and go back to clock
+                repository.setScrollingText(
+                    text = repository.getScrollingText().orEmpty(),
+                    enabled = false,
+                    speed = repository.getScrollingTextSpeed(),
+                    mode = GlyphImageRepository.ScrollingModeOnce
+                )
+                // The pref listener will trigger provider.refresh() and stop the tick
+                return
+            }
+
+            controller?.renderScrollingTextFrame()
+            scheduleScrollTextTick()
         }
     }
 
@@ -77,6 +102,9 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         if (shouldRefreshCustomGlyphForKey(key)) {
             handler.post {
                 customGlyphProvider?.refresh()
+                scrollingTextProvider?.refresh()
+                val isScrolling = scrollingTextProvider?.isScrollingTextActive() == true
+                if (isScrolling) scheduleScrollTextTick() else cancelScrollTextTick()
                 renderCurrentState(force = true)
             }
         }
@@ -149,6 +177,10 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         nextCustomGlyphProvider.refresh()
         customGlyphProvider = nextCustomGlyphProvider
 
+        val nextScrollingTextProvider = RepositoryScrollingTextProvider(repository)
+        nextScrollingTextProvider.refresh()
+        scrollingTextProvider = nextScrollingTextProvider
+
         val stateProvider = object : SystemStateProvider {
             override val isCallActive: Boolean
                 get() = this@CompositeToyService.isCallActive
@@ -160,6 +192,7 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             frameSink = GlyphDisplayAdapter(context, gmm),
             stateProvider = stateProvider,
             customGlyphProvider = nextCustomGlyphProvider,
+            scrollingTextProvider = nextScrollingTextProvider,
             liveFrameReporter = { grid, mode ->
                 LiveGlyphPreview.publish(
                     grid = grid,
@@ -210,10 +243,14 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             renderCurrentState(force = true)
         }
         scheduleNextMinuteTick()
+        if (nextScrollingTextProvider.isScrollingTextActive()) {
+            scheduleScrollTextTick()
+        }
     }
 
     override fun onServiceDisconnected(context: Context) {
         handler.removeCallbacks(minuteTickRunnable)
+        cancelScrollTextTick()
         if (::repository.isInitialized) {
             repository.unregisterChangeListener(prefListener)
         }
@@ -228,6 +265,7 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         isCallActive = false
         controller = null
         customGlyphProvider = null
+        scrollingTextProvider = null
         LiveGlyphPreview.clear(LiveGlyphSource.COMPOSITE_TOY)
     }
 
@@ -301,7 +339,11 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         }
         if (key == GlyphImageRepository.KeyActiveSelectionId ||
             key == GlyphImageRepository.KeyActiveSelectionMode ||
-            key == GlyphImageRepository.KeyImageList
+            key == GlyphImageRepository.KeyImageList ||
+            key == GlyphImageRepository.KeyScrollingText ||
+            key == GlyphImageRepository.KeyScrollingTextEnabled ||
+            key == GlyphImageRepository.KeyScrollingTextSpeed ||
+            key == GlyphImageRepository.KeyScrollingTextMode
         ) {
             return true
         }
@@ -389,6 +431,18 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
     private fun cancelRenderTick() {
         handler.removeCallbacks(renderTickRunnable)
         renderTickScheduled = false
+    }
+
+    private fun scheduleScrollTextTick() {
+        if (scrollTextTickScheduled) return
+        val delay = scrollingTextProvider?.getScrollDelayMs() ?: SCROLL_TICK_MS
+        scrollTextTickScheduled = true
+        handler.postDelayed(scrollTextTickRunnable, delay)
+    }
+
+    private fun cancelScrollTextTick() {
+        handler.removeCallbacks(scrollTextTickRunnable)
+        scrollTextTickScheduled = false
     }
 
     private fun scheduleStartupHealthCheck(startedAt: Long) {
@@ -537,6 +591,7 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
         val CALL_FRAME_SEQUENCE = intArrayOf(0, 1, 2)
         const val MAX_EQUALIZER_RETRIES = 10
         const val RENDER_TICK_MS = 50L
+        const val SCROLL_TICK_MS = 80L // ~12.5 frames per second scroll speed
         const val STARTUP_HEALTH_CHECK_DELAY_MS = 1_000L
         const val INPUT_SOFT_STALE_MS = 250L
         const val WAVEFORM_RESTART_MS = 2_000L

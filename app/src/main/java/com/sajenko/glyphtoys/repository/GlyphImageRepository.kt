@@ -1,6 +1,7 @@
 package com.sajenko.glyphtoys.repository
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
 import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
@@ -42,32 +43,30 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
             nextIds.add(image.id)
         }
 
-        prefs.edit()
-            .putString(KeyImageList, nextIds.joinToString(","))
-            .putString(imageNameKey(image.id), image.name)
-            .putString(imagePixelsKey(image.id), image.pixels)
-            .putLong(imageCreatedKey(image.id), image.createdAt)
-            .putLong(imageUpdatedKey(image.id), image.updatedAt)
-            .commit()
+        prefs.edit(commit = true) {
+            putString(KeyImageList, nextIds.joinToString(","))
+            putString(imageNameKey(image.id), image.name)
+            putString(imagePixelsKey(image.id), image.pixels)
+            putLong(imageCreatedKey(image.id), image.createdAt)
+            putLong(imageUpdatedKey(image.id), image.updatedAt)
+        }
     }
 
     fun deleteImage(id: String) {
         val nextIds = imageIds().filterNot { it == id }
-        val editor = prefs.edit()
-            .putString(KeyImageList, nextIds.joinToString(","))
-            .remove(imageNameKey(id))
-            .remove(imagePixelsKey(id))
-            .remove(imageCreatedKey(id))
-            .remove(imageUpdatedKey(id))
+        prefs.edit(commit = true) {
+            putString(KeyImageList, nextIds.joinToString(","))
+            remove(imageNameKey(id))
+            remove(imagePixelsKey(id))
+            remove(imageCreatedKey(id))
+            remove(imageUpdatedKey(id))
 
-        if (prefs.getString(KeyActiveSelectionId, null) == id) {
-            editor
-                .remove(KeyActiveSelectionId)
-                .remove(KeyActiveSelectionMode)
-                .remove(KeyActiveSelectionUpdated)
+            if (prefs.getString(KeyActiveSelectionId, null) == id) {
+                remove(KeyActiveSelectionId)
+                remove(KeyActiveSelectionMode)
+                remove(KeyActiveSelectionUpdated)
+            }
         }
-
-        editor.commit()
     }
 
     fun seedImagesOnce(seedVersionKey: String, version: Int, images: List<CustomGlyphImage>) {
@@ -81,9 +80,9 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
             }
         }
 
-        prefs.edit()
-            .putInt(seedVersionKey, version)
-            .commit()
+        prefs.edit(commit = true) {
+            putInt(seedVersionKey, version)
+        }
     }
 
     fun setActiveSelection(selection: ActiveGlyphSelection) {
@@ -92,17 +91,16 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
             return
         }
 
-        val editor = prefs.edit()
-            .putString(KeyActiveSelectionMode, selection.mode.name)
-            .putLong(KeyActiveSelectionUpdated, selection.updatedAt)
+        prefs.edit(commit = true) {
+            putString(KeyActiveSelectionMode, selection.mode.name)
+            putLong(KeyActiveSelectionUpdated, selection.updatedAt)
 
-        if (selection.imageId == null) {
-            editor.remove(KeyActiveSelectionId)
-        } else {
-            editor.putString(KeyActiveSelectionId, selection.imageId)
+            if (selection.imageId == null) {
+                remove(KeyActiveSelectionId)
+            } else {
+                putString(KeyActiveSelectionId, selection.imageId)
+            }
         }
-
-        editor.commit()
     }
 
     fun getActiveSelection(): ActiveGlyphSelection? {
@@ -126,11 +124,53 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
     }
 
     fun clearActiveSelection() {
-        prefs.edit()
-            .remove(KeyActiveSelectionId)
-            .remove(KeyActiveSelectionMode)
-            .remove(KeyActiveSelectionUpdated)
-            .commit()
+        prefs.edit(commit = true) {
+            remove(KeyActiveSelectionId)
+            remove(KeyActiveSelectionMode)
+            remove(KeyActiveSelectionUpdated)
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Scrolling text
+    // ------------------------------------------------------------------
+
+    fun getScrollingText(): String? {
+        return prefs.getString(KeyScrollingText, null)
+    }
+
+    fun isScrollingTextEnabled(): Boolean {
+        return prefs.getBoolean(KeyScrollingTextEnabled, false)
+    }
+
+    fun getScrollingTextSpeed(): Int {
+        val raw = prefs.getInt(KeyScrollingTextSpeed, DefaultScrollSpeed)
+        return if (raw > MaxScrollSpeed) {
+            // Old WPM value saved before the 1-10 scale: map proportionally
+            (raw / 20).coerceIn(1, MaxScrollSpeed)
+        } else {
+            raw.coerceIn(1, MaxScrollSpeed)
+        }
+    }
+
+    fun getScrollingTextMode(): String {
+        return prefs.getString(KeyScrollingTextMode, ScrollingModePersistent) ?: ScrollingModePersistent
+    }
+
+    fun setScrollingText(text: String, enabled: Boolean, speed: Int = DefaultScrollSpeed, mode: String = ScrollingModePersistent) {
+        prefs.edit(commit = true) {
+            putString(KeyScrollingText, text)
+            putBoolean(KeyScrollingTextEnabled, enabled)
+            putInt(KeyScrollingTextSpeed, speed)
+            putString(KeyScrollingTextMode, mode)
+        }
+    }
+
+    fun clearScrollingText() {
+        prefs.edit(commit = true) {
+            remove(KeyScrollingText)
+            putBoolean(KeyScrollingTextEnabled, false)
+        }
     }
 
     fun registerChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -155,6 +195,14 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         const val KeyActiveSelectionId = "active_selection_id"
         const val KeyActiveSelectionMode = "active_selection_mode"
         const val KeyActiveSelectionUpdated = "active_selection_updated"
+        const val KeyScrollingText = "scrolling_text_content"
+        const val KeyScrollingTextEnabled = "scrolling_text_enabled"
+        const val KeyScrollingTextSpeed = "scrolling_text_speed"
+        const val KeyScrollingTextMode = "scrolling_text_mode"
+        const val ScrollingModeOnce = "ONCE"
+        const val ScrollingModePersistent = "PERSISTENT"
+        const val DefaultScrollSpeed = 5
+        const val MaxScrollSpeed = 10
         private const val MissingTimestamp = -1L
 
         fun imageNameKey(id: String): String = "image_${id}_name"

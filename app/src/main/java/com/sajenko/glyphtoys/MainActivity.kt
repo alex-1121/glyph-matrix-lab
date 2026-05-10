@@ -2,6 +2,7 @@ package com.sajenko.glyphtoys
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -12,8 +13,13 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
@@ -192,6 +198,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             .partition(ShowcaseGlyphImages::isShowcaseImage)
 
         addCompositeItem()
+        addScrollingTextItem()
         addCreateNewItem()
         userImages
             .sortedByDescending { image -> image.createdAt }
@@ -228,6 +235,99 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             startActivity(CompositeInfoActivity.intent(this))
         }
         glyphListContainer.addView(item)
+    }
+
+    private fun addScrollingTextItem() {
+        val item = layoutInflater.inflate(R.layout.item_glyph_scrolling_text, glyphListContainer, false)
+        val badge = item.findViewById<TextView>(R.id.scrollingTextActiveBadge)
+        val currentContainer = item.findViewById<View>(R.id.scrollingTextCurrentContainer)
+        val currentValue = item.findViewById<TextView>(R.id.scrollingTextCurrentValue)
+        val desc = item.findViewById<TextView>(R.id.scrollingTextDesc)
+
+        val isEnabled = repository.isScrollingTextEnabled()
+        val currentText = repository.getScrollingText()
+        val speed = repository.getScrollingTextSpeed()
+        val mode = repository.getScrollingTextMode()
+
+        badge.visibility = if (isEnabled) View.VISIBLE else View.GONE
+        if (isEnabled && !currentText.isNullOrBlank()) {
+            currentContainer.visibility = View.VISIBLE
+            currentValue.text = currentText
+            val modeLabel = if (mode == GlyphImageRepository.ScrollingModeOnce) getString(R.string.scrolling_text_mode_once) else getString(R.string.scrolling_text_mode_persistent)
+            desc.text = getString(R.string.scrolling_text_speed_mode, speed, modeLabel)
+        } else {
+            currentContainer.visibility = View.GONE
+            desc.text = getString(R.string.scrolling_text_card_desc)
+        }
+
+        item.setOnClickListener {
+            showScrollingTextDialog()
+        }
+        glyphListContainer.addView(item)
+    }
+
+    private fun showScrollingTextDialog() {
+        val currentText = repository.getScrollingText() ?: ""
+        val isEnabled = repository.isScrollingTextEnabled()
+        val currentSpeed = repository.getScrollingTextSpeed()
+        val currentMode = repository.getScrollingTextMode()
+
+        val view = layoutInflater.inflate(R.layout.dialog_scrolling_text, null)
+        val editScrollingText = view.findViewById<EditText>(R.id.editScrollingText)
+        val labelSpeed = view.findViewById<TextView>(R.id.labelSpeed)
+        val speedSeekBar = view.findViewById<SeekBar>(R.id.speedSeekBar)
+        val modeRadioGroup = view.findViewById<RadioGroup>(R.id.modeRadioGroup)
+        val radioOnce = view.findViewById<RadioButton>(R.id.radioOnce)
+        val radioPersistent = view.findViewById<RadioButton>(R.id.radioPersistent)
+
+        editScrollingText.setText(currentText)
+        speedSeekBar.progress = currentSpeed - 1
+        labelSpeed.text = getString(R.string.scrolling_text_speed, currentSpeed)
+
+        if (currentMode == GlyphImageRepository.ScrollingModeOnce) radioOnce.isChecked = true else radioPersistent.isChecked = true
+
+        speedSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val speed = (progress + 1).coerceIn(1, GlyphImageRepository.MaxScrollSpeed)
+                labelSpeed.text = getString(R.string.scrolling_text_speed, speed)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.scrolling_text_dialog_title))
+        builder.setView(view)
+
+        builder.setPositiveButton(getString(R.string.scrolling_text_btn_enable)) { _, _ ->
+            val text = editScrollingText.text.toString().trim()
+            if (text.isNotEmpty()) {
+                val speed = (speedSeekBar.progress + 1).coerceIn(1, GlyphImageRepository.MaxScrollSpeed)
+                val mode = if (radioOnce.isChecked) GlyphImageRepository.ScrollingModeOnce else GlyphImageRepository.ScrollingModePersistent
+                repository.setScrollingText(text, enabled = true, speed = speed, mode = mode)
+                Toast.makeText(this, getString(R.string.toast_scrolling_text_enabled), Toast.LENGTH_SHORT).show()
+                rebuildGlyphList()
+                updateConfiguredPreview()
+            }
+        }
+
+        if (isEnabled) {
+            builder.setNeutralButton(getString(R.string.scrolling_text_btn_disable)) { _, _ ->
+                repository.setScrollingText(
+                    text = repository.getScrollingText().orEmpty(),
+                    enabled = false,
+                    speed = repository.getScrollingTextSpeed(),
+                    mode = repository.getScrollingTextMode(),
+                )
+                Toast.makeText(this, getString(R.string.toast_scrolling_text_disabled), Toast.LENGTH_SHORT).show()
+                rebuildGlyphList()
+                updateConfiguredPreview()
+            }
+        }
+        
+        builder.setNegativeButton(getString(R.string.btn_cancel), null)
+
+        builder.show()
     }
 
     private fun addCreateNewItem() {
@@ -278,6 +378,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             LiveGlyphMode.CLOCK -> getString(R.string.live_mode_clock)
             LiveGlyphMode.CUSTOM_IDLE -> getString(R.string.live_mode_custom_idle)
             LiveGlyphMode.EQUALIZER -> getString(R.string.live_mode_equalizer)
+            LiveGlyphMode.SCROLLING_TEXT -> getString(R.string.live_mode_scrolling_text)
             LiveGlyphMode.STATIC_IMAGE -> getString(R.string.live_mode_static_image)
         }
     }
