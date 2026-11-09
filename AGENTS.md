@@ -130,7 +130,7 @@ Each toy is an Android `Service` that extends `GlyphToyBase`. The base class:
 
 Toys can delegate to pure abstractions that are testable without Robolectric:
 
-- `PixelGrid` — 13×13 boolean domain model (no Android dependencies)
+- `PixelGrid` — 13×13 domain model, brightness 0..255 per pixel with an on/off API (no Android dependencies)
 - `FrameSink` — interface for rendering frames
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
@@ -138,6 +138,10 @@ Toys can delegate to pure abstractions that are testable without Robolectric:
 - `CompositeToyController` — orchestrates mode switching (CALL/EQUALIZER/CUSTOM_IDLE/CLOCK)
 - `CustomGlyphProvider` / `RepositoryCustomGlyphProvider` — supplies selected idle custom images to the composite toy
 - `GlyphImageSerializer` — serializes custom 13x13 images as 169-character binary strings
+- `TextFrameScroller` — pull-based scrolling text contract (`nextFrame`, `currentFrame`, `hasFinishedCycle`, `reset`)
+- `ScrollCycle` — scroll offset state machine: starts at -13, +1 px per frame, wraps at the content width
+- `ScrollSpeed` — scrolling text speed in px/s (8..40, default 20) → tick delay `1000 / px` ms
+- `NTypeTextScroller` — "Large" scrolling text via the SDK's NType82 font, rendered one frame per offset; `createOrNull` returns `null` so callers can fall back
 
 This separation enables fast JVM unit tests via `./gradlew testDebugUnitTest`.
 
@@ -272,7 +276,7 @@ Mode transitions are automatic: call → CALL, playback → EQUALIZER, idle with
 
 **Internal architecture:** The service delegates to `CompositeToyController` which operates on pure abstractions:
 
-- `PixelGrid` — 13×13 boolean domain model (no Android dependencies)
+- `PixelGrid` — 13×13 domain model, brightness 0..255 per pixel with an on/off API (no Android dependencies)
 - `FrameSink` — interface for rendering frames
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
@@ -294,7 +298,14 @@ AOD toy for custom images selected with `DisplayPriority.ALWAYS_ON`:
 
 ### NTypeTextSpikeToyService (debug builds only)
 
-Throwaway reference toy in `app/src/debug/` for the undocumented SDK NType text API (`GlyphMatrixNTypeUtils.animateText`). It scrolls a fixed string, sends each 169-value frame to `setMatrixFrame(int[])`, and logs support checks, frame timing and ASCII frames under the `NTypeSpike` logcat tag. It appears in the picker as **Matrix Lab: NType text (debug spike)** and is never packaged into release builds.
+Reference toy in `app/src/debug/` for the undocumented SDK NType text API. It alternates two passes over `"MATRIX LAB 0123"`: a PUSH pass (`GlyphMatrixNTypeUtils.animateTextOnce`, frames sent straight to `setMatrixFrame(int[])`) and a PULL pass (`NTypeTextScroller` driven by a main-thread `Handler` tick at 24 px/s, sent through `GlyphDisplayAdapter`). After each pull pass it logs `pull frames matching a push frame: X/Y` (exact, including brightness), render time and cycle completion under the `NTypeSpike` logcat tag. It appears in the picker as **Matrix Lab: NType text (debug spike)** and is never packaged into release builds.
+
+Verified 2026-11-09 on 4a Pro (OS 5.0): 129/129 pull frames match, about 1 ms per frame, and both passes look identical on the matrix.
+
+NType rendering notes:
+
+- Frames are anti-aliased: values 0..2047 in 7 levels. The matrix full scale is 0..4095 (a white bitmap pixel at object brightness 255), so NType text runs at about half brightness. `NTypeTextScroller.gridFromViewPortData` keeps that ratio (2047 → `PixelGrid` 127). Mapping 2047 to full white looks visibly harsher.
+- Accented letters lose their marks at 13 px (Ä → A).
 
 ## Troubleshooting
 
