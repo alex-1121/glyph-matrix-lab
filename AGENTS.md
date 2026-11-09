@@ -86,6 +86,8 @@ Settings -> Glyph Interface -> Always-on Glyph Toy
 
 Only one toy can be active at a time. The master toggle is at the top of that screen.
 
+> Nothing OS 5.0 (Android 17, build C5.0-261021-1625 on 4a Pro) moved Glyph settings into a dedicated Glyph app. Verified 2026-11-09: `AodToySelectActivity` still resolves via adb, the debug flag survived the update, and both Matrix Lab toys list and run. The OS bug persists: after selecting a toy the matrix can stay blank until Glyph Interface is toggled off and on. Upstream README writes the Settings path as `Settings > Glyph Interface > Flip to Glyph > Always-on Glyph Toy` (Settings path not re-verified).
+
 ## Project Overview
 
 This is an Android app for creating Glyph Toys, which are services that render visuals on the Nothing Phone (4a) Pro 13x13 Glyph Matrix LED display. The launcher UI handles audio permission, shows the latest live toy frame when available, lists saved custom images, and provides a masked 13x13 image editor. Toy output still comes from background services activated from device Settings.
@@ -95,6 +97,8 @@ SDK location:
 ```text
 app/libs/glyph-matrix-sdk-2.0.aar
 ```
+
+This AAR is taken from `Nothing-Developer-Programme/Glyph-Developer-Kit/sdk/` (the unified Glyph + GlyphMatrix SDK, updated 2026-07), not from `GlyphMatrix-Developer-Kit`, whose same-named AAR is an older subset. Core matrix classes are identical in both; the unified one adds undocumented NType text APIs (`com.nothinglondon.text.TextSdk`/`ScrollingText`, `com.nothing.ketchum.GlyphMatrixNTypeUtils`) and `Common.is25131()` (Phone 4b).
 
 The proprietary Nothing SDK provides `GlyphMatrixManager`, `GlyphMatrixFrame`, `GlyphMatrixObject`, `GlyphToy`, and related classes under `com.nothing.ketchum`.
 
@@ -126,7 +130,7 @@ Each toy is an Android `Service` that extends `GlyphToyBase`. The base class:
 
 Toys can delegate to pure abstractions that are testable without Robolectric:
 
-- `PixelGrid` — 13×13 boolean domain model (no Android dependencies)
+- `PixelGrid` — 13×13 domain model, brightness 0..255 per pixel with an on/off API (no Android dependencies)
 - `FrameSink` — interface for rendering frames
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
@@ -134,6 +138,10 @@ Toys can delegate to pure abstractions that are testable without Robolectric:
 - `CompositeToyController` — orchestrates mode switching (CALL/EQUALIZER/CUSTOM_IDLE/CLOCK)
 - `CustomGlyphProvider` / `RepositoryCustomGlyphProvider` — supplies selected idle custom images to the composite toy
 - `GlyphImageSerializer` — serializes custom 13x13 images as 169-character binary strings
+- `TextFrameScroller` — pull-based scrolling text contract (`nextFrame`, `currentFrame`, `hasFinishedCycle`, `reset`)
+- `ScrollCycle` — scroll offset state machine: starts at -13, +1 px per frame, shows the fully exited (blank) frame, then wraps
+- `ScrollSpeed` — scrolling text speed in px/s (8..40, default 20) → tick delay `1000 / px` ms
+- `NTypeTextScroller` — "Large" scrolling text via the SDK's NType82 font, rendered one frame per offset; `createOrNull` returns `null` so callers can fall back
 
 This separation enables fast JVM unit tests via `./gradlew testDebugUnitTest`.
 
@@ -268,7 +276,7 @@ Mode transitions are automatic: call → CALL, playback → EQUALIZER, idle with
 
 **Internal architecture:** The service delegates to `CompositeToyController` which operates on pure abstractions:
 
-- `PixelGrid` — 13×13 boolean domain model (no Android dependencies)
+- `PixelGrid` — 13×13 domain model, brightness 0..255 per pixel with an on/off API (no Android dependencies)
 - `FrameSink` — interface for rendering frames
 - `GlyphDisplayAdapter` — converts `PixelGrid` → `Bitmap` → SDK
 - `FrameBuilders` — static builders for clock, equalizer, call grids
@@ -287,6 +295,17 @@ AOD toy for custom images selected with `DisplayPriority.ALWAYS_ON`:
 - Re-renders on `onAod()` and relevant shared-preference changes
 - Displays an empty grid when there is no active `ALWAYS_ON` image
 - Publishes `LiveGlyphPreview` frames with `LiveGlyphMode.STATIC_IMAGE`
+
+### NTypeTextSpikeToyService (debug builds only)
+
+Reference toy in `app/src/debug/` for the undocumented SDK NType text API. It alternates two passes over `"MATRIX LAB 0123"`: a PUSH pass (`GlyphMatrixNTypeUtils.animateTextOnce`, frames sent straight to `setMatrixFrame(int[])`) and a PULL pass (`NTypeTextScroller` driven by a main-thread `Handler` tick at 24 px/s, sent through `GlyphDisplayAdapter`). After each pull pass it logs `pull frames matching a push frame: X/Y` (exact, including brightness), render time and cycle completion under the `NTypeSpike` logcat tag. It appears in the picker as **Matrix Lab: NType text (debug spike)** and is never packaged into release builds.
+
+Verified 2026-11-09 on 4a Pro (OS 5.0): 129/129 pull frames match, about 1 ms per frame, and both passes look identical on the matrix.
+
+NType rendering notes:
+
+- Frames are anti-aliased: values 0..2047 in 7 levels. The matrix full scale is 0..4095 (a white bitmap pixel at object brightness 255), so NType text runs at about half brightness. `NTypeTextScroller.gridFromViewPortData` keeps that ratio (2047 → `PixelGrid` 127). Mapping 2047 to full white looks visibly harsher.
+- Accented letters lose their marks at 13 px (Ä → A).
 
 ## Troubleshooting
 

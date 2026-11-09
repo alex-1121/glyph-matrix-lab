@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import com.sajenko.glyphtoys.R
 import com.sajenko.glyphtoys.models.MaskedPixelGrid
 import com.sajenko.glyphtoys.toys.PixelGrid
@@ -44,6 +45,9 @@ class GlyphMatrixView @JvmOverloads constructor(
     }
     private val onPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.pixel_on)
+        style = Paint.Style.FILL
+    }
+    private val partialPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
     }
 
@@ -90,16 +94,20 @@ class GlyphMatrixView @JvmOverloads constructor(
                     top + cellSize - cellInset,
                 )
 
-                val lit = if (masked != null) {
-                    masked.isLit(x, y)
+                val level = if (masked != null) {
+                    if (masked.isLit(x, y)) PixelGrid.MAX_BRIGHTNESS else 0
                 } else {
-                    pixelGrid?.get(x, y) == true
+                    pixelGrid?.brightness(x, y) ?: 0
                 }
 
-                canvas.drawRect(
-                    cellRect,
-                    if (lit) onPaint else offPaint,
-                )
+                val paint = when (level) {
+                    0 -> offPaint
+                    PixelGrid.MAX_BRIGHTNESS -> onPaint
+                    else -> partialPaint.apply {
+                        color = ColorUtils.blendARGB(offPaint.color, onPaint.color, level / PixelGrid.MAX_BRIGHTNESS.toFloat())
+                    }
+                }
+                canvas.drawRect(cellRect, paint)
             }
         }
     }
