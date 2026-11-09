@@ -86,6 +86,8 @@ Settings -> Glyph Interface -> Always-on Glyph Toy
 
 Only one toy can be active at a time. The master toggle is at the top of that screen.
 
+> Nothing OS 5.0 (Android 17, build C5.0-261021-1625 on 4a Pro) moved Glyph settings into a dedicated Glyph app. Verified 2026-11-09: `AodToySelectActivity` still resolves via adb, the debug flag survived the update, and both Matrix Lab toys list and run. The OS bug persists: after selecting a toy the matrix can stay blank until Glyph Interface is toggled off and on. Upstream README writes the Settings path as `Settings > Glyph Interface > Flip to Glyph > Always-on Glyph Toy` (Settings path not re-verified).
+
 ## Project Overview
 
 This is an Android app for creating Glyph Toys, which are services that render visuals on the Nothing Phone (4a) Pro 13x13 Glyph Matrix LED display. The launcher UI handles audio permission, shows the latest live toy frame when available, lists saved custom images, and provides a masked 13x13 image editor. Toy output still comes from background services activated from device Settings.
@@ -95,6 +97,8 @@ SDK location:
 ```text
 app/libs/glyph-matrix-sdk-2.0.aar
 ```
+
+This AAR is taken from `Nothing-Developer-Programme/Glyph-Developer-Kit/sdk/` (the unified Glyph + GlyphMatrix SDK, updated 2026-07), not from `GlyphMatrix-Developer-Kit`, whose same-named AAR is an older subset. Core matrix classes are identical in both; the unified one adds undocumented NType text APIs (`com.nothinglondon.text.TextSdk`/`ScrollingText`, `com.nothing.ketchum.GlyphMatrixNTypeUtils`) and `Common.is25131()` (Phone 4b).
 
 The proprietary Nothing SDK provides `GlyphMatrixManager`, `GlyphMatrixFrame`, `GlyphMatrixObject`, `GlyphToy`, and related classes under `com.nothing.ketchum`.
 
