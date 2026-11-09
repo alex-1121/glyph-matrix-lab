@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toy_name_ntype_spike">Matrix Lab: NType text (debug spike)</string>
+    <string name="toy_summary_ntype_spike">Debug-only test of the SDK scrolling text.</string>
+</resources>

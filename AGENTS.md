@@ -292,6 +292,10 @@ AOD toy for custom images selected with `DisplayPriority.ALWAYS_ON`:
 - Displays an empty grid when there is no active `ALWAYS_ON` image
 - Publishes `LiveGlyphPreview` frames with `LiveGlyphMode.STATIC_IMAGE`
 
+### NTypeTextSpikeToyService (debug builds only)
+
+Throwaway reference toy in `app/src/debug/` for the undocumented SDK NType text API (`GlyphMatrixNTypeUtils.animateText`). It scrolls a fixed string, sends each 169-value frame to `setMatrixFrame(int[])`, and logs support checks, frame timing and ASCII frames under the `NTypeSpike` logcat tag. It appears in the picker as **Matrix Lab: NType text (debug spike)** and is never packaged into release builds.
+
 ## Troubleshooting
 
 ### Equalizer Shows Static Bars Instead of Reacting to Audio
