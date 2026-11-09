@@ -31,3 +31,6 @@ Thumbs.db
 # The GlyphMatrix SDK AAR has no Maven artifact and must be committed.
 /filter_logs.py
 /plans/
+
+# Personal notes
+/ideas.md
