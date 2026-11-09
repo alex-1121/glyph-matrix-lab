@@ -25,11 +25,11 @@ class ScrollCycleTest {
     }
 
     @Test
-    fun `wraps to start once content has left the left edge`() {
+    fun `shows the fully exited frame before wrapping`() {
         val cycle = ScrollCycle(contentWidth = 20)
 
-        repeat(13 + 19) { cycle.advance() }
-        assertEquals(19, cycle.offset)
+        repeat(13 + 20) { cycle.advance() }
+        assertEquals(20, cycle.offset)
         assertFalse(cycle.hasFinishedCycle)
 
         cycle.advance()
@@ -38,7 +38,7 @@ class ScrollCycleTest {
     }
 
     @Test
-    fun `one full cycle is display plus content width frames`() {
+    fun `one full cycle is display plus content width plus one blank frame`() {
         val cycle = ScrollCycle(contentWidth = 20)
         var frames = 0
 
@@ -47,7 +47,7 @@ class ScrollCycleTest {
             frames++
         }
 
-        assertEquals(33, frames)
+        assertEquals(34, frames)
     }
 
     @Test
