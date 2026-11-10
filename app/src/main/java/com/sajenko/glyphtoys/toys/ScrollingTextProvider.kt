@@ -52,10 +52,7 @@ class RepositoryScrollingTextProvider(
             else -> TextScroller(text)
         }
 
-        // Map user-facing speed scale 1-10 to scroll delay.
-        // Speed 1 = slowest (longest delay), Speed 10 = fastest (shortest delay).
-        val speed = repository.getScrollingTextSpeed().coerceIn(1, 10)
-        scrollDelayMs = (150L / speed).coerceIn(15L, 150L)
+        scrollDelayMs = ScrollSpeed.tickDelayMs(repository.getScrollingTextSpeed())
     }
 
     override fun isScrollingTextActive(): Boolean = enabled && scroller != null

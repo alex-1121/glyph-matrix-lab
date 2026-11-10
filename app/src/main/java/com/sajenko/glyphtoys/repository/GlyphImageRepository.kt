@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
 import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
+import com.sajenko.glyphtoys.toys.ScrollSpeed
 import com.sajenko.glyphtoys.serialization.GlyphImageSerializer
 
 class GlyphImageRepository(private val prefs: SharedPreferences) {
@@ -143,14 +144,9 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         return prefs.getBoolean(KeyScrollingTextEnabled, false)
     }
 
+    /** Scroll speed in pixels per second, clamped to [ScrollSpeed]'s range. */
     fun getScrollingTextSpeed(): Int {
-        val raw = prefs.getInt(KeyScrollingTextSpeed, DefaultScrollSpeed)
-        return if (raw > MaxScrollSpeed) {
-            // Old WPM value saved before the 1-10 scale: map proportionally
-            (raw / 20).coerceIn(1, MaxScrollSpeed)
-        } else {
-            raw.coerceIn(1, MaxScrollSpeed)
-        }
+        return ScrollSpeed.clamp(prefs.getInt(KeyScrollingTextSpeed, ScrollSpeed.DEFAULT_PX_PER_SEC))
     }
 
     fun getScrollingTextMode(): String {
@@ -164,7 +160,7 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
     fun setScrollingText(
         text: String,
         enabled: Boolean,
-        speed: Int = DefaultScrollSpeed,
+        speed: Int = ScrollSpeed.DEFAULT_PX_PER_SEC,
         mode: String = ScrollingModePersistent,
         style: String = ScrollingStyleLarge,
     ) {
@@ -208,15 +204,14 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         const val KeyActiveSelectionUpdated = "active_selection_updated"
         const val KeyScrollingText = "scrolling_text_content"
         const val KeyScrollingTextEnabled = "scrolling_text_enabled"
-        const val KeyScrollingTextSpeed = "scrolling_text_speed"
+        // px/s; a new key so values from the old 1-10 scale are ignored
+        const val KeyScrollingTextSpeed = "scrolling_text_speed_px_s"
         const val KeyScrollingTextMode = "scrolling_text_mode"
         const val ScrollingModeOnce = "ONCE"
         const val ScrollingModePersistent = "PERSISTENT"
         const val KeyScrollingTextStyle = "scrolling_text_style"
         const val ScrollingStyleLarge = "LARGE"
         const val ScrollingStyleCompact = "COMPACT"
-        const val DefaultScrollSpeed = 5
-        const val MaxScrollSpeed = 10
         private const val MissingTimestamp = -1L
 
         fun imageNameKey(id: String): String = "image_${id}_name"

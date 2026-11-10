@@ -289,7 +289,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
         editScrollingText.filters = arrayOf(scrollingTextInputFilter)
         editScrollingText.setText(currentText)
-        speedSeekBar.progress = currentSpeed - 1
+        speedSeekBar.progress = currentSpeed
         labelSpeed.text = getString(R.string.scrolling_text_speed, currentSpeed)
 
         if (currentMode == GlyphImageRepository.ScrollingModeOnce) radioOnce.isChecked = true else radioPersistent.isChecked = true
@@ -297,8 +297,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
 
         speedSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val speed = (progress + 1).coerceIn(1, GlyphImageRepository.MaxScrollSpeed)
-                labelSpeed.text = getString(R.string.scrolling_text_speed, speed)
+                labelSpeed.text = getString(R.string.scrolling_text_speed, progress)
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -311,7 +310,7 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         builder.setPositiveButton(getString(R.string.scrolling_text_btn_enable)) { _, _ ->
             val text = editScrollingText.text.toString().trim()
             if (text.isNotEmpty()) {
-                val speed = (speedSeekBar.progress + 1).coerceIn(1, GlyphImageRepository.MaxScrollSpeed)
+                val speed = speedSeekBar.progress
                 val mode = if (radioOnce.isChecked) GlyphImageRepository.ScrollingModeOnce else GlyphImageRepository.ScrollingModePersistent
                 val style = if (radioCompact.isChecked) GlyphImageRepository.ScrollingStyleCompact else GlyphImageRepository.ScrollingStyleLarge
                 repository.setScrollingText(text, enabled = true, speed = speed, mode = mode, style = style)

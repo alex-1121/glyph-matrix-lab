@@ -28,7 +28,6 @@
         android:id="@+id/labelSpeed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/scrolling_text_speed_default"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:layout_marginTop="20dp"
@@ -38,8 +37,8 @@
         android:id="@+id/speedSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="9"
-        android:progress="4" />
+        android:min="8"
+        android:max="40" />
 
     <TextView
         android:layout_width="match_parent"

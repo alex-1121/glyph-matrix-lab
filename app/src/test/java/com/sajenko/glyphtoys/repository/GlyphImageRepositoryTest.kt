@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.sajenko.glyphtoys.models.ActiveGlyphSelection
 import com.sajenko.glyphtoys.models.CustomGlyphImage
 import com.sajenko.glyphtoys.models.DisplayPriority
+import com.sajenko.glyphtoys.toys.ScrollSpeed
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -77,6 +78,28 @@ class GlyphImageRepositoryTest {
         repository.setScrollingText("HI", enabled = true, style = GlyphImageRepository.ScrollingStyleCompact)
 
         assertEquals(GlyphImageRepository.ScrollingStyleCompact, repository.getScrollingTextStyle())
+    }
+
+    @Test
+    fun `scrolling text speed defaults to 20 px per second`() {
+        assertEquals(ScrollSpeed.DEFAULT_PX_PER_SEC, repository.getScrollingTextSpeed())
+        assertEquals(20, repository.getScrollingTextSpeed())
+    }
+
+    @Test
+    fun `scrolling text speed round trips`() {
+        repository.setScrollingText("HI", enabled = true, speed = 33)
+
+        assertEquals(33, repository.getScrollingTextSpeed())
+    }
+
+    @Test
+    fun `scrolling text speed is clamped to 8 to 40`() {
+        repository.setScrollingText("HI", enabled = true, speed = 2)
+        assertEquals(ScrollSpeed.MIN_PX_PER_SEC, repository.getScrollingTextSpeed())
+
+        repository.setScrollingText("HI", enabled = true, speed = 500)
+        assertEquals(ScrollSpeed.MAX_PX_PER_SEC, repository.getScrollingTextSpeed())
     }
 
     private fun testImage(id: String): CustomGlyphImage {
