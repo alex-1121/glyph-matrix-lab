@@ -15,8 +15,9 @@ class GlyphDisplayAdapter(
         val bitmap = Bitmap.createBitmap(grid.size, grid.size, Bitmap.Config.ARGB_8888)
         for (y in 0 until grid.size) {
             for (x in 0 until grid.size) {
-                if (grid.get(x, y)) {
-                    bitmap.setPixel(x, y, Color.WHITE)
+                val level = grid.brightness(x, y)
+                if (level > 0) {
+                    bitmap.setPixel(x, y, Color.rgb(level, level, level))
                 }
             }
         }
