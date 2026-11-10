@@ -16,8 +16,21 @@ object AodToySelectionAdvisor {
         }
     }
 
-    fun guidanceFor(mode: DisplayPriority, actualSource: LiveGlyphSource?): AodToySetupGuidance? {
-        val expectedSource = expectedSource(mode)
+    /**
+     * Returns setup guidance when the running toy doesn't match what's configured, or null.
+     * Scrolling text only renders in the Composite toy, so it expects Composite whatever
+     * image is selected.
+     */
+    fun guidanceFor(
+        mode: DisplayPriority?,
+        actualSource: LiveGlyphSource?,
+        scrollingTextEnabled: Boolean = false,
+    ): AodToySetupGuidance? {
+        val expectedSource = when {
+            scrollingTextEnabled -> LiveGlyphSource.COMPOSITE_TOY
+            mode != null -> expectedSource(mode)
+            else -> return null
+        }
         if (actualSource == expectedSource) {
             return null
         }

@@ -177,11 +177,13 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
     }
 
     private fun updateAodWarning(selection: ActiveGlyphSelection?, frame: LiveGlyphFrame?) {
-        val guidance = selection?.let {
-            AodToySelectionAdvisor.guidanceFor(it.mode, frame?.source)
-        }
+        val guidance = AodToySelectionAdvisor.guidanceFor(
+            mode = selection?.mode,
+            actualSource = frame?.source,
+            scrollingTextEnabled = repository.isScrollingTextEnabled(),
+        )
 
-        if (selection == null || guidance == null) {
+        if (guidance == null) {
             aodWarningContainer.visibility = View.GONE
             return
         }
