@@ -87,11 +87,8 @@
     <string name="live_mode_scrolling_text">Scrolling Text</string>
     <string name="toast_scrolling_text_enabled">Scrolling text enabled</string>
     <string name="toast_scrolling_text_disabled">Scrolling text disabled</string>
-    <string name="scrolling_text_speed_mode">%1$s · %2$d px/s · %3$s</string>
+    <string name="scrolling_text_style_speed">%1$s · %2$d px/s</string>
     <string name="scrolling_text_speed">Speed: %1$d px/s</string>
-    <string name="scrolling_text_display_duration">Display Duration</string>
-    <string name="scrolling_text_mode_once">Show Once</string>
-    <string name="scrolling_text_mode_persistent">Loop Forever</string>
     <string name="scrolling_text_style">Text Size</string>
     <string name="scrolling_text_style_large">Large</string>
     <string name="scrolling_text_style_compact">Compact</string>

@@ -277,7 +277,6 @@ class CompositeToyControllerTest {
             advances++
             return frame
         }
-        override fun hasFinishedCycle(): Boolean = false
         override fun getScrollDelayMs(): Long = 50L
         override fun reset() = Unit
     }

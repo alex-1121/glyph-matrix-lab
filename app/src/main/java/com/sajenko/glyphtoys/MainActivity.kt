@@ -17,7 +17,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -251,16 +250,14 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         val isEnabled = repository.isScrollingTextEnabled()
         val currentText = repository.getScrollingText()
         val speed = repository.getScrollingTextSpeed()
-        val mode = repository.getScrollingTextMode()
         val style = repository.getScrollingTextStyle()
 
         badge.visibility = if (isEnabled) View.VISIBLE else View.GONE
         if (isEnabled && !currentText.isNullOrBlank()) {
             currentContainer.visibility = View.VISIBLE
             currentValue.text = currentText
-            val modeLabel = if (mode == GlyphImageRepository.ScrollingModeOnce) getString(R.string.scrolling_text_mode_once) else getString(R.string.scrolling_text_mode_persistent)
             val styleLabel = if (style == GlyphImageRepository.ScrollingStyleCompact) getString(R.string.scrolling_text_style_compact) else getString(R.string.scrolling_text_style_large)
-            desc.text = getString(R.string.scrolling_text_speed_mode, styleLabel, speed, modeLabel)
+            desc.text = getString(R.string.scrolling_text_style_speed, styleLabel, speed)
         } else {
             currentContainer.visibility = View.GONE
             desc.text = getString(R.string.scrolling_text_card_desc)
@@ -276,16 +273,12 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         val currentText = repository.getScrollingText() ?: ""
         val isEnabled = repository.isScrollingTextEnabled()
         val currentSpeed = repository.getScrollingTextSpeed()
-        val currentMode = repository.getScrollingTextMode()
         val currentStyle = repository.getScrollingTextStyle()
 
         val view = layoutInflater.inflate(R.layout.dialog_scrolling_text, null)
         val editScrollingText = view.findViewById<EditText>(R.id.editScrollingText)
         val labelSpeed = view.findViewById<TextView>(R.id.labelSpeed)
         val speedSeekBar = view.findViewById<SeekBar>(R.id.speedSeekBar)
-        val modeRadioGroup = view.findViewById<RadioGroup>(R.id.modeRadioGroup)
-        val radioOnce = view.findViewById<RadioButton>(R.id.radioOnce)
-        val radioPersistent = view.findViewById<RadioButton>(R.id.radioPersistent)
         val radioLarge = view.findViewById<RadioButton>(R.id.radioLarge)
         val radioCompact = view.findViewById<RadioButton>(R.id.radioCompact)
 
@@ -294,7 +287,6 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
         speedSeekBar.progress = currentSpeed
         labelSpeed.text = getString(R.string.scrolling_text_speed, currentSpeed)
 
-        if (currentMode == GlyphImageRepository.ScrollingModeOnce) radioOnce.isChecked = true else radioPersistent.isChecked = true
         if (currentStyle == GlyphImageRepository.ScrollingStyleCompact) radioCompact.isChecked = true else radioLarge.isChecked = true
 
         speedSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -313,9 +305,8 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
             val text = editScrollingText.text.toString().trim()
             if (text.isNotEmpty()) {
                 val speed = speedSeekBar.progress
-                val mode = if (radioOnce.isChecked) GlyphImageRepository.ScrollingModeOnce else GlyphImageRepository.ScrollingModePersistent
                 val style = if (radioCompact.isChecked) GlyphImageRepository.ScrollingStyleCompact else GlyphImageRepository.ScrollingStyleLarge
-                repository.setScrollingText(text, enabled = true, speed = speed, mode = mode, style = style)
+                repository.setScrollingText(text, enabled = true, speed = speed, style = style)
                 Toast.makeText(this, getString(R.string.toast_scrolling_text_enabled), Toast.LENGTH_SHORT).show()
                 rebuildGlyphList()
                 updateConfiguredPreview()
@@ -328,7 +319,6 @@ class MainActivity : Activity(), LiveGlyphPreview.Listener {
                     text = repository.getScrollingText().orEmpty(),
                     enabled = false,
                     speed = repository.getScrollingTextSpeed(),
-                    mode = repository.getScrollingTextMode(),
                     style = repository.getScrollingTextStyle(),
                 )
                 Toast.makeText(this, getString(R.string.toast_scrolling_text_disabled), Toast.LENGTH_SHORT).show()

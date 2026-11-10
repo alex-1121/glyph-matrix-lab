@@ -149,10 +149,6 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         return ScrollSpeed.clamp(prefs.getInt(KeyScrollingTextSpeed, ScrollSpeed.DEFAULT_PX_PER_SEC))
     }
 
-    fun getScrollingTextMode(): String {
-        return prefs.getString(KeyScrollingTextMode, ScrollingModePersistent) ?: ScrollingModePersistent
-    }
-
     fun getScrollingTextStyle(): String {
         return prefs.getString(KeyScrollingTextStyle, ScrollingStyleLarge) ?: ScrollingStyleLarge
     }
@@ -161,14 +157,12 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         text: String,
         enabled: Boolean,
         speed: Int = ScrollSpeed.DEFAULT_PX_PER_SEC,
-        mode: String = ScrollingModePersistent,
         style: String = ScrollingStyleLarge,
     ) {
         prefs.edit(commit = true) {
             putString(KeyScrollingText, text)
             putBoolean(KeyScrollingTextEnabled, enabled)
             putInt(KeyScrollingTextSpeed, speed)
-            putString(KeyScrollingTextMode, mode)
             putString(KeyScrollingTextStyle, style)
         }
     }
@@ -206,9 +200,6 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         const val KeyScrollingTextEnabled = "scrolling_text_enabled"
         // px/s; a new key so values from the old 1-10 scale are ignored
         const val KeyScrollingTextSpeed = "scrolling_text_speed_px_s"
-        const val KeyScrollingTextMode = "scrolling_text_mode"
-        const val ScrollingModeOnce = "ONCE"
-        const val ScrollingModePersistent = "PERSISTENT"
         const val KeyScrollingTextStyle = "scrolling_text_style"
         const val ScrollingStyleLarge = "LARGE"
         const val ScrollingStyleCompact = "COMPACT"

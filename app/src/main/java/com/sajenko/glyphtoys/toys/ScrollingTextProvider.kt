@@ -12,7 +12,6 @@ interface ScrollingTextProvider {
     fun isScrollingTextActive(): Boolean
     fun currentFrame(): PixelGrid
     fun nextScrollFrame(): PixelGrid
-    fun hasFinishedCycle(): Boolean
     fun getScrollDelayMs(): Long
     fun reset()
 }
@@ -22,7 +21,6 @@ object EmptyScrollingTextProvider : ScrollingTextProvider {
     override fun isScrollingTextActive(): Boolean = false
     override fun currentFrame(): PixelGrid = PixelGrid()
     override fun nextScrollFrame(): PixelGrid = PixelGrid()
-    override fun hasFinishedCycle(): Boolean = false
     override fun getScrollDelayMs(): Long = 80L
     override fun reset() = Unit
 }
@@ -60,8 +58,6 @@ class RepositoryScrollingTextProvider(
     override fun currentFrame(): PixelGrid = scroller?.currentFrame() ?: PixelGrid()
 
     override fun nextScrollFrame(): PixelGrid = scroller?.nextFrame() ?: PixelGrid()
-
-    override fun hasFinishedCycle(): Boolean = scroller?.hasFinishedCycle ?: false
 
     override fun getScrollDelayMs(): Long = scrollDelayMs
 
