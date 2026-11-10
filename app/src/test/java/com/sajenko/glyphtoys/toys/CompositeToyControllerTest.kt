@@ -11,18 +11,21 @@ class CompositeToyControllerTest {
     private val fakeState = FakeSystemStateProvider()
     private val fakeTime = FakeTimeProvider(currentHour = 12, currentMinute = 30)
     private val fakeCustomGlyphProvider = FakeCustomGlyphProvider()
+    private val fakeScrollingText = FakeScrollingTextProvider()
     private val reportedFrames = mutableListOf<Pair<DisplayMode, PixelGrid>>()
     private lateinit var controller: CompositeToyController
 
     @Before
     fun setup() {
         fakeCustomGlyphProvider.grid = null
+        fakeScrollingText.active = false
         reportedFrames.clear()
         controller = CompositeToyController(
             frameSink = fakeSink,
             stateProvider = fakeState,
             timeProvider = fakeTime,
             customGlyphProvider = fakeCustomGlyphProvider,
+            scrollingTextProvider = fakeScrollingText,
             liveFrameReporter = { grid, mode -> reportedFrames.add(mode to grid.copy()) },
         )
     }
@@ -224,6 +227,59 @@ class CompositeToyControllerTest {
                 assertFalse("Col $col row $row should be off", grid.get(col, row))
             }
         }
+    }
+
+    @Test
+    fun `scrolling text beats custom idle image and clock`() {
+        fakeCustomGlyphProvider.grid = PixelGrid().apply { set(6, 6) }
+        fakeScrollingText.active = true
+
+        assertEquals(DisplayMode.SCROLLING_TEXT, controller.currentMode())
+    }
+
+    @Test
+    fun `call and media take precedence over scrolling text`() {
+        fakeScrollingText.active = true
+
+        fakeState.isMediaPlaying = true
+        assertEquals(DisplayMode.EQUALIZER, controller.currentMode())
+
+        fakeState.isCallActive = true
+        assertEquals(DisplayMode.CALL, controller.currentMode())
+    }
+
+    @Test
+    fun `scroll tick renders and advances only in SCROLLING_TEXT mode`() {
+        fakeScrollingText.active = true
+        fakeState.isMediaPlaying = true
+
+        controller.renderScrollingTextFrame()
+
+        assertEquals(0, fakeScrollingText.advances)
+        assertEquals(0, fakeSink.frameCount())
+
+        fakeState.isMediaPlaying = false
+        controller.renderScrollingTextFrame()
+
+        assertEquals(1, fakeScrollingText.advances)
+        assertTrue(fakeSink.lastFrame()!!.get(0, 0))
+        assertEquals(DisplayMode.SCROLLING_TEXT, reportedFrames.last().first)
+    }
+
+    private class FakeScrollingTextProvider : ScrollingTextProvider {
+        var active = false
+        var advances = 0
+        private val frame = PixelGrid().apply { set(0, 0) }
+
+        override fun isScrollingTextActive(): Boolean = active
+        override fun currentFrame(): PixelGrid = frame
+        override fun nextScrollFrame(): PixelGrid {
+            advances++
+            return frame
+        }
+        override fun hasFinishedCycle(): Boolean = false
+        override fun getScrollDelayMs(): Long = 50L
+        override fun reset() = Unit
     }
 
     private class FakeCustomGlyphProvider : CustomGlyphProvider {

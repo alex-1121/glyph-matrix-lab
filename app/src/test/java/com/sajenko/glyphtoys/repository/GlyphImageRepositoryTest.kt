@@ -67,6 +67,18 @@ class GlyphImageRepositoryTest {
         assertNull(repository.getActiveSelection())
     }
 
+    @Test
+    fun `scrolling text style defaults to large`() {
+        assertEquals(GlyphImageRepository.ScrollingStyleLarge, repository.getScrollingTextStyle())
+    }
+
+    @Test
+    fun `scrolling text style round trips`() {
+        repository.setScrollingText("HI", enabled = true, style = GlyphImageRepository.ScrollingStyleCompact)
+
+        assertEquals(GlyphImageRepository.ScrollingStyleCompact, repository.getScrollingTextStyle())
+    }
+
     private fun testImage(id: String): CustomGlyphImage {
         return CustomGlyphImage(
             id = id,

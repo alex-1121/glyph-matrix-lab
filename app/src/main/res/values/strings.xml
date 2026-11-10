@@ -78,7 +78,7 @@
     <string name="scrolling_text_card_name">Scrolling Text</string>
     <string name="scrolling_text_card_desc">Scroll custom text across the Glyph Matrix when idle</string>
     <string name="scrolling_text_dialog_title">Set Scrolling Text</string>
-    <string name="scrolling_text_dialog_hint">Enter your message (A–Z, 0–9)</string>
+    <string name="scrolling_text_dialog_hint">Enter your message (A–Z, 0–9, ! ? . , - :)</string>
     <string name="scrolling_text_btn_enable">Enable &amp; Set Text</string>
     <string name="scrolling_text_btn_disable">Disable Scrolling Text</string>
     <string name="scrolling_text_active_badge">Active</string>
@@ -87,10 +87,13 @@
     <string name="live_mode_scrolling_text">Scrolling Text</string>
     <string name="toast_scrolling_text_enabled">Scrolling text enabled</string>
     <string name="toast_scrolling_text_disabled">Scrolling text disabled</string>
-    <string name="scrolling_text_speed_mode">Speed: %1$d (%2$s)</string>
+    <string name="scrolling_text_speed_mode">%1$s · Speed: %2$d · %3$s</string>
     <string name="scrolling_text_speed">Speed: %1$d</string>
     <string name="scrolling_text_speed_default">Speed: 5</string>
     <string name="scrolling_text_display_duration">Display Duration</string>
     <string name="scrolling_text_mode_once">Show Once</string>
     <string name="scrolling_text_mode_persistent">Loop Forever</string>
+    <string name="scrolling_text_style">Text Size</string>
+    <string name="scrolling_text_style_large">Large</string>
+    <string name="scrolling_text_style_compact">Compact</string>
 </resources>

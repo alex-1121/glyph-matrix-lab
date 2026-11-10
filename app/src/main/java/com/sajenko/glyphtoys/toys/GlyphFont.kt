@@ -45,6 +45,9 @@ object GlyphFont {
         return bitmap
     }
 
+    /** True if [char] has a glyph. Unsupported characters render as a space. */
+    fun isSupported(char: Char): Boolean = char in FONT
+
     private fun fontFor(char: Char): Array<String> {
         return FONT[char] ?: FONT[' ']!!
     }

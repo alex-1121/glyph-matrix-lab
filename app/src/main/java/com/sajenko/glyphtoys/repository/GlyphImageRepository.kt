@@ -157,12 +157,23 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         return prefs.getString(KeyScrollingTextMode, ScrollingModePersistent) ?: ScrollingModePersistent
     }
 
-    fun setScrollingText(text: String, enabled: Boolean, speed: Int = DefaultScrollSpeed, mode: String = ScrollingModePersistent) {
+    fun getScrollingTextStyle(): String {
+        return prefs.getString(KeyScrollingTextStyle, ScrollingStyleLarge) ?: ScrollingStyleLarge
+    }
+
+    fun setScrollingText(
+        text: String,
+        enabled: Boolean,
+        speed: Int = DefaultScrollSpeed,
+        mode: String = ScrollingModePersistent,
+        style: String = ScrollingStyleLarge,
+    ) {
         prefs.edit(commit = true) {
             putString(KeyScrollingText, text)
             putBoolean(KeyScrollingTextEnabled, enabled)
             putInt(KeyScrollingTextSpeed, speed)
             putString(KeyScrollingTextMode, mode)
+            putString(KeyScrollingTextStyle, style)
         }
     }
 
@@ -201,6 +212,9 @@ class GlyphImageRepository(private val prefs: SharedPreferences) {
         const val KeyScrollingTextMode = "scrolling_text_mode"
         const val ScrollingModeOnce = "ONCE"
         const val ScrollingModePersistent = "PERSISTENT"
+        const val KeyScrollingTextStyle = "scrolling_text_style"
+        const val ScrollingStyleLarge = "LARGE"
+        const val ScrollingStyleCompact = "COMPACT"
         const val DefaultScrollSpeed = 5
         const val MaxScrollSpeed = 10
         private const val MissingTimestamp = -1L

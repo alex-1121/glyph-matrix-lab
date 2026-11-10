@@ -64,7 +64,8 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
                     text = repository.getScrollingText().orEmpty(),
                     enabled = false,
                     speed = repository.getScrollingTextSpeed(),
-                    mode = GlyphImageRepository.ScrollingModeOnce
+                    mode = GlyphImageRepository.ScrollingModeOnce,
+                    style = repository.getScrollingTextStyle(),
                 )
                 // The pref listener will trigger provider.refresh() and stop the tick
                 return
@@ -343,7 +344,8 @@ open class CompositeToyService : GlyphToyBase("CompositeToy") {
             key == GlyphImageRepository.KeyScrollingText ||
             key == GlyphImageRepository.KeyScrollingTextEnabled ||
             key == GlyphImageRepository.KeyScrollingTextSpeed ||
-            key == GlyphImageRepository.KeyScrollingTextMode
+            key == GlyphImageRepository.KeyScrollingTextMode ||
+            key == GlyphImageRepository.KeyScrollingTextStyle
         ) {
             return true
         }
