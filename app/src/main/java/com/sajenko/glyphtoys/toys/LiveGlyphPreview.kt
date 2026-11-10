@@ -14,6 +14,7 @@ enum class LiveGlyphMode {
     CLOCK,
     CUSTOM_IDLE,
     EQUALIZER,
+    SCROLLING_TEXT,
     STATIC_IMAGE,
 }
 
@@ -98,5 +99,6 @@ fun DisplayMode.toLiveGlyphMode(): LiveGlyphMode {
         DisplayMode.CLOCK -> LiveGlyphMode.CLOCK
         DisplayMode.CUSTOM_IDLE -> LiveGlyphMode.CUSTOM_IDLE
         DisplayMode.EQUALIZER -> LiveGlyphMode.EQUALIZER
+        DisplayMode.SCROLLING_TEXT -> LiveGlyphMode.SCROLLING_TEXT
     }
 }

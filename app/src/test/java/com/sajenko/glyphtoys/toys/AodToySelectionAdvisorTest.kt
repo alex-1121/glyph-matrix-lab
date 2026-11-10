@@ -61,4 +61,40 @@ class AodToySelectionAdvisorTest {
         assertEquals(LiveGlyphSource.COMPOSITE_TOY, guidance!!.expectedSource)
         assertNull(guidance.actualSource)
     }
+
+    @Test
+    fun `scrolling text expects composite even with an always on image`() {
+        val guidance = AodToySelectionAdvisor.guidanceFor(
+            DisplayPriority.ALWAYS_ON,
+            LiveGlyphSource.STATIC_IMAGE_TOY,
+            scrollingTextEnabled = true,
+        )
+
+        assertNotNull(guidance)
+        assertEquals(LiveGlyphSource.COMPOSITE_TOY, guidance!!.expectedSource)
+    }
+
+    @Test
+    fun `scrolling text on composite has no guidance`() {
+        assertNull(
+            AodToySelectionAdvisor.guidanceFor(
+                DisplayPriority.ALWAYS_ON,
+                LiveGlyphSource.COMPOSITE_TOY,
+                scrollingTextEnabled = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `scrolling text without image selection still expects composite`() {
+        val guidance = AodToySelectionAdvisor.guidanceFor(null, null, scrollingTextEnabled = true)
+
+        assertNotNull(guidance)
+        assertEquals(LiveGlyphSource.COMPOSITE_TOY, guidance!!.expectedSource)
+    }
+
+    @Test
+    fun `no selection and no scrolling text has no guidance`() {
+        assertNull(AodToySelectionAdvisor.guidanceFor(null, null))
+    }
 }

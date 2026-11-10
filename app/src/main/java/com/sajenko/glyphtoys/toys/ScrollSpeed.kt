@@ -6,7 +6,7 @@ package com.sajenko.glyphtoys.toys
  * Phone (4a) Pro runs at 24 px/s.
  */
 object ScrollSpeed {
-    const val MIN_PX_PER_SEC = 8
+    const val MIN_PX_PER_SEC = 2
     const val MAX_PX_PER_SEC = 40
     const val DEFAULT_PX_PER_SEC = 20
 
