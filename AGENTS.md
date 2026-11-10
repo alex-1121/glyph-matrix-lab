@@ -140,7 +140,7 @@ Toys can delegate to pure abstractions that are testable without Robolectric:
 - `GlyphImageSerializer` — serializes custom 13x13 images as 169-character binary strings
 - `TextFrameScroller` — pull-based scrolling text contract (`nextFrame`, `currentFrame`, `hasFinishedCycle`, `reset`)
 - `ScrollCycle` — scroll offset state machine: starts at -13, +1 px per frame, shows the fully exited (blank) frame, then wraps
-- `ScrollSpeed` — scrolling text speed in px/s (8..40, default 20) → tick delay `1000 / px` ms
+- `ScrollSpeed` — scrolling text speed in px/s (2..40, default 20) → tick delay `1000 / px` ms
 - `NTypeTextScroller` — "Large" scrolling text via the SDK's NType82 font, rendered one frame per offset; `createOrNull` returns `null` so callers can fall back
 
 This separation enables fast JVM unit tests via `./gradlew testDebugUnitTest`.

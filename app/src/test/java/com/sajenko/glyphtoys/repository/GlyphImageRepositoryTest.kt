@@ -94,8 +94,8 @@ class GlyphImageRepositoryTest {
     }
 
     @Test
-    fun `scrolling text speed is clamped to 8 to 40`() {
-        repository.setScrollingText("HI", enabled = true, speed = 2)
+    fun `scrolling text speed is clamped to 2 to 40`() {
+        repository.setScrollingText("HI", enabled = true, speed = 0)
         assertEquals(ScrollSpeed.MIN_PX_PER_SEC, repository.getScrollingTextSpeed())
 
         repository.setScrollingText("HI", enabled = true, speed = 500)
